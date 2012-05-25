@@ -11,6 +11,7 @@ use Thrift::BinaryProtocol;
 # EDAMNoteStore::NoteStore の中などで使われているが, その中では use されていないので
 # ここで use しなければならない
 use EDAMTypes::Types;
+use EDAMErrors::Types;
 #     $VAR1 = 'Undefined subroutine &EDAMTypes::Notebook called at modules/evernote-sdk-perl/lib//EDAMNoteStore/NoteStore.pm line 1137.
 #   みたいなエラーが出る
 use EDAMUserStore::UserStore;
