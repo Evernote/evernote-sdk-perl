@@ -1,8 +1,10 @@
 use strict;
 use warnings;
 
-use IO::File;
 use FindBin;
+use lib "$FindBin::Bin/../../lib";
+
+use IO::File;
 use Digest::MD5;
 use Data::Dumper;
 
