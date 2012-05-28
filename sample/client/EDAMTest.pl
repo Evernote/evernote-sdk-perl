@@ -10,12 +10,8 @@ use Data::Dumper;
 
 use Thrift::HttpClient;
 use Thrift::BinaryProtocol;
-# EDAMNoteStore::NoteStore の中などで使われているが, その中では use されていないので
-# ここで use しなければならない
-use EDAMTypes::Types;
-use EDAMErrors::Types;
-#     $VAR1 = 'Undefined subroutine &EDAMTypes::Notebook called at modules/evernote-sdk-perl/lib//EDAMNoteStore/NoteStore.pm line 1137.
-#   みたいなエラーが出る
+use EDAMTypes::Types;  # you must do `use' EDAMTypes::Types and EDAMErrors::Types
+use EDAMErrors::Types; # before doing `use' EDAMUserStore::UserStore or EDAMNoteStore::NoteStore
 use EDAMUserStore::UserStore;
 use EDAMNoteStore::NoteStore;
 use EDAMUserStore::Constants;
@@ -38,7 +34,7 @@ eval {
     my $user_store_url = 'https://' . $evernote_host . '/edam/user';
 
     my $user_store_client = Thrift::HttpClient->new( $user_store_url );
-    # timeout のデフォルト値 (200 / 700) だと短すぎるので, 長くする
+    # default timeout value may be too short
     $user_store_client->setSendTimeout( 2000 );
     $user_store_client->setRecvTimeout( 10000 );
     my $user_store_prot = Thrift::BinaryProtocol->new( $user_store_client );
@@ -53,18 +49,17 @@ eval {
     }
 
     my $note_store_url = $user_store->getNoteStoreUrl( $auth_token );
-    #my $note_store_url = 'https://sandbox.evernote.com/edam/note/shard/s1';
 
     warn '[INFO] note store url : ' . $note_store_url;
     my $note_store_client = Thrift::HttpClient->new( $note_store_url );
-    # timeout のデフォルト値 (200 / 700) だと短すぎるので, 長くする
+    # default timeout value may be too short
     $note_store_client->setSendTimeout( 2000 );
     $note_store_client->setRecvTimeout( 10000 );
     my $note_store_prot = Thrift::BinaryProtocol->new( $note_store_client );
     my $note_store = EDAMNoteStore::NoteStoreClient->new( $note_store_prot, $note_store_prot );
 
     # List all of the notebooks in the user's account
-    my $notebooks = $note_store->listNotebooks( $auth_token ); # ARRAY[EDAMTypes::Notebook]
+    my $notebooks = $note_store->listNotebooks( $auth_token ); # ARRAY of EDAMTypes::Notebook objects
 
     printf "Found %d notebooks:\n", scalar(@$notebooks);
     my $default_notebook = $notebooks->[0];
@@ -126,7 +121,6 @@ eval {
     my $created_note = $note_store->createNote( $auth_token, $note );
 
     printf "Successfully created a new note with GUID: %s\n", $created_note->guid;
-
 };
 if ( $@ ) {
     warn 'ERROR';
