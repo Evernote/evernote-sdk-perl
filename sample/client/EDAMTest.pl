@@ -7,7 +7,14 @@ use lib "$FindBin::Bin/../../lib";
 use IO::File;
 use Digest::MD5;
 use Data::Dumper;
+use Scalar::Util qw( blessed );
+use Exception::Class (
+    'EDAMTest::Exception::ExceptionWrapper',
+    'EDAMTest::Exception::FileIOError',
+);
 
+use LWP::Protocol::https; # it is not needed to 'use' here, but it must be installed.
+        # if it is not installed, an error (Thrift::TException object) is to be thrown.
 use Thrift::HttpClient;
 use Thrift::BinaryProtocol;
 use EDAMTypes::Types;  # you must do `use' EDAMTypes::Types and EDAMErrors::Types
@@ -30,6 +37,15 @@ if ( $auth_token eq 'your developer token' ) {
 }
 
 eval {
+    # any exception occured in this eval block is Exception::Class::Base object.
+    # if other is thrown, it is to be wrapped in EDAMTest::Exception::ExceptionWrapper.
+    local $SIG{__DIE__} = sub {
+        my ( $err ) = @_;
+        if ( not ( blessed $err && $err->isa('Exception::Class::Base') ) ) {
+            EDAMTest::Exception::ExceptionWrapper->throw( error => $err );
+        }
+    };
+
     my $evernote_host = 'sandbox.evernote.com';
     my $user_store_url = 'https://' . $evernote_host . '/edam/user';
 
@@ -82,7 +98,8 @@ eval {
     #/ include attributes such as filename and location.
     my $filename = $FindBin::Bin . "/enlogo.png";
     my $image_bin = do {
-        my $iof = IO::File->new( $filename, '<' ) or die 'file open failed';
+        my $iof = IO::File->new( $filename, '<' )
+            or EDAMTest::Exception::FileIOError->throw( "file open failed: $filename" );
         $iof->binmode( ':bytes' );
         do { local $/; <$iof> };
     };
@@ -122,7 +139,17 @@ eval {
 
     printf "Successfully created a new note with GUID: %s\n", $created_note->guid;
 };
-if ( $@ ) {
-    warn 'ERROR';
-    warn Dumper $@;
+if ( my $err = $@ ) {
+    print STDERR "[ERROR]\n";
+    if ( blessed $err->error ) {
+        print STDERR "=== Error object ===\n";
+        local $Data::Dumper::Indent = 1;
+        print STDERR Dumper( $err->error );
+    } else {
+        print STDERR "=== Error message ===\n";
+        print STDERR $err->error, "\n";
+    }
+    print STDERR "=== Stack trace ===\n";
+    print STDERR $err->trace->as_string;
+    exit 1;
 }
