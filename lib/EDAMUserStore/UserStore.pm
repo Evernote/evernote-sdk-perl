@@ -22,7 +22,7 @@ sub new {
   my $vals      = shift || {};
   $self->{clientName} = undef;
   $self->{edamVersionMajor} = 1;
-  $self->{edamVersionMinor} = 21;
+  $self->{edamVersionMinor} = 22;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{clientName}) {
       $self->{clientName} = $vals->{clientName};

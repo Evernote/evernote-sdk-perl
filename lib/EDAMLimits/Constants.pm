@@ -236,4 +236,16 @@ use constant EDAM_CONTENT_CLASS_HELLO_PROFILE => "evernote.hello.profile";
 
 use constant EDAM_CONTENT_CLASS_FOOD_MEAL => "evernote.food.meal";
 
+use constant EDAM_CONTENT_CLASS_SKITCH => "evernote.skitch";
+
+use constant EDAM_RELATED_PLAINTEXT_LEN_MIN => 1;
+
+use constant EDAM_RELATED_PLAINTEXT_LEN_MAX => 131072;
+
+use constant EDAM_RELATED_MAX_NOTES => 25;
+
+use constant EDAM_RELATED_MAX_NOTEBOOKS => 1;
+
+use constant EDAM_RELATED_MAX_TAGS => 25;
+
 1;

@@ -523,7 +523,7 @@ sub write {
 
 package EDAMUserStore::BootstrapSettings;
 use base qw(Class::Accessor);
-EDAMUserStore::BootstrapSettings->mk_accessors( qw( serviceHost marketingUrl supportUrl accountEmailDomain enableFacebookSharing enableGiftSubscriptions enableSupportTickets enableSharedNotebooks enableSingleNoteSharing enableSponsoredAccounts enableTwitterSharing ) );
+EDAMUserStore::BootstrapSettings->mk_accessors( qw( serviceHost marketingUrl supportUrl accountEmailDomain enableFacebookSharing enableGiftSubscriptions enableSupportTickets enableSharedNotebooks enableSingleNoteSharing enableSponsoredAccounts enableTwitterSharing enableLinkedInSharing ) );
 
 sub new {
   my $classname = shift;
@@ -540,6 +540,7 @@ sub new {
   $self->{enableSingleNoteSharing} = undef;
   $self->{enableSponsoredAccounts} = undef;
   $self->{enableTwitterSharing} = undef;
+  $self->{enableLinkedInSharing} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{serviceHost}) {
       $self->{serviceHost} = $vals->{serviceHost};
@@ -573,6 +574,9 @@ sub new {
     }
     if (defined $vals->{enableTwitterSharing}) {
       $self->{enableTwitterSharing} = $vals->{enableTwitterSharing};
+    }
+    if (defined $vals->{enableLinkedInSharing}) {
+      $self->{enableLinkedInSharing} = $vals->{enableLinkedInSharing};
     }
   }
   return bless ($self, $classname);
@@ -663,6 +667,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^12$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{enableLinkedInSharing});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -728,6 +738,11 @@ sub write {
   if (defined $self->{enableTwitterSharing}) {
     $xfer += $output->writeFieldBegin('enableTwitterSharing', TType::BOOL, 11);
     $xfer += $output->writeBool($self->{enableTwitterSharing});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{enableLinkedInSharing}) {
+    $xfer += $output->writeFieldBegin('enableLinkedInSharing', TType::BOOL, 12);
+    $xfer += $output->writeBool($self->{enableLinkedInSharing});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
