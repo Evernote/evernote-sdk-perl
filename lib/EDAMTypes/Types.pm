@@ -30,6 +30,23 @@ use constant ACTIVE => 2;
 use constant FAILED => 3;
 use constant CANCELLATION_PENDING => 4;
 use constant CANCELED => 5;
+package EDAMTypes::SharedNotebookPrivilegeLevel;
+use constant READ_NOTEBOOK => 0;
+use constant MODIFY_NOTEBOOK_PLUS_ACTIVITY => 1;
+use constant READ_NOTEBOOK_PLUS_ACTIVITY => 2;
+use constant GROUP => 3;
+use constant FULL_ACCESS => 4;
+use constant BUSINESS_FULL_ACCESS => 5;
+package EDAMTypes::SponsoredGroupRole;
+use constant GROUP_MEMBER => 1;
+use constant GROUP_ADMIN => 2;
+use constant GROUP_OWNER => 3;
+package EDAMTypes::BusinessUserRole;
+use constant ADMIN => 1;
+use constant NORMAL => 2;
+package EDAMTypes::SharedNotebookInstanceRestrictions;
+use constant ONLY_JOINED_OR_PREVIEW => 1;
+use constant NO_SHARED_NOTEBOOKS => 2;
 package EDAMTypes::Data;
 use base qw(Class::Accessor);
 EDAMTypes::Data->mk_accessors( qw( bodyHash size body ) );
@@ -126,7 +143,7 @@ sub write {
 
 package EDAMTypes::UserAttributes;
 use base qw(Class::Accessor);
-EDAMTypes::UserAttributes->mk_accessors( qw( defaultLocationName defaultLatitude defaultLongitude preactivation viewedPromotions incomingEmailAddress recentMailedAddresses comments dateAgreedToTermsOfService maxReferrals referralCount refererCode sentEmailDate sentEmailCount dailyEmailLimit emailOptOutDate partnerEmailOptInDate preferredLanguage preferredCountry clipFullPage twitterUserName twitterId groupName recognitionLanguage customerProfileId referralProof educationalDiscount businessAddress hideSponsorBilling ) );
+EDAMTypes::UserAttributes->mk_accessors( qw( defaultLocationName defaultLatitude defaultLongitude preactivation viewedPromotions incomingEmailAddress recentMailedAddresses comments dateAgreedToTermsOfService maxReferrals referralCount refererCode sentEmailDate sentEmailCount dailyEmailLimit emailOptOutDate partnerEmailOptInDate preferredLanguage preferredCountry clipFullPage twitterUserName twitterId groupName recognitionLanguage customerProfileId referralProof educationalDiscount businessAddress hideSponsorBilling taxExempt ) );
 
 sub new {
   my $classname = shift;
@@ -161,6 +178,7 @@ sub new {
   $self->{educationalDiscount} = undef;
   $self->{businessAddress} = undef;
   $self->{hideSponsorBilling} = undef;
+  $self->{taxExempt} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{defaultLocationName}) {
       $self->{defaultLocationName} = $vals->{defaultLocationName};
@@ -248,6 +266,9 @@ sub new {
     }
     if (defined $vals->{hideSponsorBilling}) {
       $self->{hideSponsorBilling} = $vals->{hideSponsorBilling};
+    }
+    if (defined $vals->{taxExempt}) {
+      $self->{taxExempt} = $vals->{taxExempt};
     }
   }
   return bless ($self, $classname);
@@ -470,6 +491,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^32$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{taxExempt});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -645,6 +672,11 @@ sub write {
     $xfer += $output->writeBool($self->{hideSponsorBilling});
     $xfer += $output->writeFieldEnd();
   }
+  if (defined $self->{taxExempt}) {
+    $xfer += $output->writeFieldBegin('taxExempt', TType::BOOL, 32);
+    $xfer += $output->writeBool($self->{taxExempt});
+    $xfer += $output->writeFieldEnd();
+  }
   $xfer += $output->writeFieldStop();
   $xfer += $output->writeStructEnd();
   return $xfer;
@@ -652,7 +684,7 @@ sub write {
 
 package EDAMTypes::Accounting;
 use base qw(Class::Accessor);
-EDAMTypes::Accounting->mk_accessors( qw( uploadLimit uploadLimitEnd uploadLimitNextMonth premiumServiceStatus premiumOrderNumber premiumCommerceService premiumServiceStart premiumServiceSKU lastSuccessfulCharge lastFailedCharge lastFailedChargeReason nextPaymentDue premiumLockUntil updated premiumSubscriptionNumber lastRequestedCharge currency unitPrice ) );
+EDAMTypes::Accounting->mk_accessors( qw( uploadLimit uploadLimitEnd uploadLimitNextMonth premiumServiceStatus premiumOrderNumber premiumCommerceService premiumServiceStart premiumServiceSKU lastSuccessfulCharge lastFailedCharge lastFailedChargeReason nextPaymentDue premiumLockUntil updated premiumSubscriptionNumber lastRequestedCharge currency unitPrice businessId businessName businessRole ) );
 
 sub new {
   my $classname = shift;
@@ -676,6 +708,9 @@ sub new {
   $self->{lastRequestedCharge} = undef;
   $self->{currency} = undef;
   $self->{unitPrice} = undef;
+  $self->{businessId} = undef;
+  $self->{businessName} = undef;
+  $self->{businessRole} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{uploadLimit}) {
       $self->{uploadLimit} = $vals->{uploadLimit};
@@ -730,6 +765,15 @@ sub new {
     }
     if (defined $vals->{unitPrice}) {
       $self->{unitPrice} = $vals->{unitPrice};
+    }
+    if (defined $vals->{businessId}) {
+      $self->{businessId} = $vals->{businessId};
+    }
+    if (defined $vals->{businessName}) {
+      $self->{businessName} = $vals->{businessName};
+    }
+    if (defined $vals->{businessRole}) {
+      $self->{businessRole} = $vals->{businessRole};
     }
   }
   return bless ($self, $classname);
@@ -862,6 +906,24 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^20$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{businessId});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^21$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{businessName});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^22$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{businessRole});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -964,6 +1026,220 @@ sub write {
     $xfer += $output->writeI32($self->{unitPrice});
     $xfer += $output->writeFieldEnd();
   }
+  if (defined $self->{businessId}) {
+    $xfer += $output->writeFieldBegin('businessId', TType::I32, 20);
+    $xfer += $output->writeI32($self->{businessId});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{businessName}) {
+    $xfer += $output->writeFieldBegin('businessName', TType::STRING, 21);
+    $xfer += $output->writeString($self->{businessName});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{businessRole}) {
+    $xfer += $output->writeFieldBegin('businessRole', TType::I32, 22);
+    $xfer += $output->writeI32($self->{businessRole});
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMTypes::PremiumInfo;
+use base qw(Class::Accessor);
+EDAMTypes::PremiumInfo->mk_accessors( qw( currentTime premium premiumRecurring premiumExpirationDate premiumExtendable premiumPending premiumCancellationPending canPurchaseUploadAllowance sponsoredGroupName sponsoredGroupRole ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{currentTime} = undef;
+  $self->{premium} = undef;
+  $self->{premiumRecurring} = undef;
+  $self->{premiumExpirationDate} = undef;
+  $self->{premiumExtendable} = undef;
+  $self->{premiumPending} = undef;
+  $self->{premiumCancellationPending} = undef;
+  $self->{canPurchaseUploadAllowance} = undef;
+  $self->{sponsoredGroupName} = undef;
+  $self->{sponsoredGroupRole} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{currentTime}) {
+      $self->{currentTime} = $vals->{currentTime};
+    }
+    if (defined $vals->{premium}) {
+      $self->{premium} = $vals->{premium};
+    }
+    if (defined $vals->{premiumRecurring}) {
+      $self->{premiumRecurring} = $vals->{premiumRecurring};
+    }
+    if (defined $vals->{premiumExpirationDate}) {
+      $self->{premiumExpirationDate} = $vals->{premiumExpirationDate};
+    }
+    if (defined $vals->{premiumExtendable}) {
+      $self->{premiumExtendable} = $vals->{premiumExtendable};
+    }
+    if (defined $vals->{premiumPending}) {
+      $self->{premiumPending} = $vals->{premiumPending};
+    }
+    if (defined $vals->{premiumCancellationPending}) {
+      $self->{premiumCancellationPending} = $vals->{premiumCancellationPending};
+    }
+    if (defined $vals->{canPurchaseUploadAllowance}) {
+      $self->{canPurchaseUploadAllowance} = $vals->{canPurchaseUploadAllowance};
+    }
+    if (defined $vals->{sponsoredGroupName}) {
+      $self->{sponsoredGroupName} = $vals->{sponsoredGroupName};
+    }
+    if (defined $vals->{sponsoredGroupRole}) {
+      $self->{sponsoredGroupRole} = $vals->{sponsoredGroupRole};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'PremiumInfo';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::I64) {
+        $xfer += $input->readI64(\$self->{currentTime});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{premium});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{premiumRecurring});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^4$/ && do{      if ($ftype == TType::I64) {
+        $xfer += $input->readI64(\$self->{premiumExpirationDate});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^5$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{premiumExtendable});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^6$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{premiumPending});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^7$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{premiumCancellationPending});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^8$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{canPurchaseUploadAllowance});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^9$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{sponsoredGroupName});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^10$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{sponsoredGroupRole});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('PremiumInfo');
+  if (defined $self->{currentTime}) {
+    $xfer += $output->writeFieldBegin('currentTime', TType::I64, 1);
+    $xfer += $output->writeI64($self->{currentTime});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{premium}) {
+    $xfer += $output->writeFieldBegin('premium', TType::BOOL, 2);
+    $xfer += $output->writeBool($self->{premium});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{premiumRecurring}) {
+    $xfer += $output->writeFieldBegin('premiumRecurring', TType::BOOL, 3);
+    $xfer += $output->writeBool($self->{premiumRecurring});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{premiumExpirationDate}) {
+    $xfer += $output->writeFieldBegin('premiumExpirationDate', TType::I64, 4);
+    $xfer += $output->writeI64($self->{premiumExpirationDate});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{premiumExtendable}) {
+    $xfer += $output->writeFieldBegin('premiumExtendable', TType::BOOL, 5);
+    $xfer += $output->writeBool($self->{premiumExtendable});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{premiumPending}) {
+    $xfer += $output->writeFieldBegin('premiumPending', TType::BOOL, 6);
+    $xfer += $output->writeBool($self->{premiumPending});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{premiumCancellationPending}) {
+    $xfer += $output->writeFieldBegin('premiumCancellationPending', TType::BOOL, 7);
+    $xfer += $output->writeBool($self->{premiumCancellationPending});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{canPurchaseUploadAllowance}) {
+    $xfer += $output->writeFieldBegin('canPurchaseUploadAllowance', TType::BOOL, 8);
+    $xfer += $output->writeBool($self->{canPurchaseUploadAllowance});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{sponsoredGroupName}) {
+    $xfer += $output->writeFieldBegin('sponsoredGroupName', TType::STRING, 9);
+    $xfer += $output->writeString($self->{sponsoredGroupName});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{sponsoredGroupRole}) {
+    $xfer += $output->writeFieldBegin('sponsoredGroupRole', TType::I32, 10);
+    $xfer += $output->writeI32($self->{sponsoredGroupRole});
+    $xfer += $output->writeFieldEnd();
+  }
   $xfer += $output->writeFieldStop();
   $xfer += $output->writeStructEnd();
   return $xfer;
@@ -971,7 +1247,7 @@ sub write {
 
 package EDAMTypes::User;
 use base qw(Class::Accessor);
-EDAMTypes::User->mk_accessors( qw( id username email name timezone privilege created updated deleted active shardId attributes accounting ) );
+EDAMTypes::User->mk_accessors( qw( id username email name timezone privilege created updated deleted active shardId attributes accounting premiumInfo ) );
 
 sub new {
   my $classname = shift;
@@ -990,6 +1266,7 @@ sub new {
   $self->{shardId} = undef;
   $self->{attributes} = undef;
   $self->{accounting} = undef;
+  $self->{premiumInfo} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{id}) {
       $self->{id} = $vals->{id};
@@ -1029,6 +1306,9 @@ sub new {
     }
     if (defined $vals->{accounting}) {
       $self->{accounting} = $vals->{accounting};
+    }
+    if (defined $vals->{premiumInfo}) {
+      $self->{premiumInfo} = $vals->{premiumInfo};
     }
   }
   return bless ($self, $classname);
@@ -1133,6 +1413,13 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^17$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{premiumInfo} = new EDAMTypes::PremiumInfo();
+        $xfer += $self->{premiumInfo}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -1208,6 +1495,11 @@ sub write {
   if (defined $self->{accounting}) {
     $xfer += $output->writeFieldBegin('accounting', TType::STRUCT, 16);
     $xfer += $self->{accounting}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{premiumInfo}) {
+    $xfer += $output->writeFieldBegin('premiumInfo', TType::STRUCT, 17);
+    $xfer += $self->{premiumInfo}->write($output);
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -1914,7 +2206,7 @@ sub write {
 
 package EDAMTypes::NoteAttributes;
 use base qw(Class::Accessor);
-EDAMTypes::NoteAttributes->mk_accessors( qw( subjectDate latitude longitude altitude author source sourceURL sourceApplication shareDate placeName contentClass applicationData lastEditedBy ) );
+EDAMTypes::NoteAttributes->mk_accessors( qw( subjectDate latitude longitude altitude author source sourceURL sourceApplication shareDate placeName contentClass applicationData lastEditedBy classifications ) );
 
 sub new {
   my $classname = shift;
@@ -1933,6 +2225,7 @@ sub new {
   $self->{contentClass} = undef;
   $self->{applicationData} = undef;
   $self->{lastEditedBy} = undef;
+  $self->{classifications} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{subjectDate}) {
       $self->{subjectDate} = $vals->{subjectDate};
@@ -1972,6 +2265,9 @@ sub new {
     }
     if (defined $vals->{lastEditedBy}) {
       $self->{lastEditedBy} = $vals->{lastEditedBy};
+    }
+    if (defined $vals->{classifications}) {
+      $self->{classifications} = $vals->{classifications};
     }
   }
   return bless ($self, $classname);
@@ -2075,6 +2371,27 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^26$/ && do{      if ($ftype == TType::MAP) {
+        {
+          my $_size30 = 0;
+          $self->{classifications} = {};
+          my $_ktype31 = 0;
+          my $_vtype32 = 0;
+          $xfer += $input->readMapBegin(\$_ktype31, \$_vtype32, \$_size30);
+          for (my $_i34 = 0; $_i34 < $_size30; ++$_i34)
+          {
+            my $key35 = '';
+            my $val36 = '';
+            $xfer += $input->readString(\$key35);
+            $xfer += $input->readString(\$val36);
+            $self->{classifications}->{$key35} = $val36;
+          }
+          $xfer += $input->readMapEnd();
+        }
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -2150,6 +2467,21 @@ sub write {
   if (defined $self->{lastEditedBy}) {
     $xfer += $output->writeFieldBegin('lastEditedBy', TType::STRING, 24);
     $xfer += $output->writeString($self->{lastEditedBy});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{classifications}) {
+    $xfer += $output->writeFieldBegin('classifications', TType::MAP, 26);
+    {
+      $xfer += $output->writeMapBegin(TType::STRING, TType::STRING, scalar(keys %{$self->{classifications}}));
+      {
+        while( my ($kiter37,$viter38) = each %{$self->{classifications}}) 
+        {
+          $xfer += $output->writeString($kiter37);
+          $xfer += $output->writeString($viter38);
+        }
+      }
+      $xfer += $output->writeMapEnd();
+    }
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -2317,15 +2649,15 @@ sub read {
       last; };
       /^12$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size30 = 0;
+          my $_size39 = 0;
           $self->{tagGuids} = [];
-          my $_etype33 = 0;
-          $xfer += $input->readListBegin(\$_etype33, \$_size30);
-          for (my $_i34 = 0; $_i34 < $_size30; ++$_i34)
+          my $_etype42 = 0;
+          $xfer += $input->readListBegin(\$_etype42, \$_size39);
+          for (my $_i43 = 0; $_i43 < $_size39; ++$_i43)
           {
-            my $elem35 = undef;
-            $xfer += $input->readString(\$elem35);
-            push(@{$self->{tagGuids}},$elem35);
+            my $elem44 = undef;
+            $xfer += $input->readString(\$elem44);
+            push(@{$self->{tagGuids}},$elem44);
           }
           $xfer += $input->readListEnd();
         }
@@ -2335,16 +2667,16 @@ sub read {
       last; };
       /^13$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size36 = 0;
+          my $_size45 = 0;
           $self->{resources} = [];
-          my $_etype39 = 0;
-          $xfer += $input->readListBegin(\$_etype39, \$_size36);
-          for (my $_i40 = 0; $_i40 < $_size36; ++$_i40)
+          my $_etype48 = 0;
+          $xfer += $input->readListBegin(\$_etype48, \$_size45);
+          for (my $_i49 = 0; $_i49 < $_size45; ++$_i49)
           {
-            my $elem41 = undef;
-            $elem41 = new EDAMTypes::Resource();
-            $xfer += $elem41->read($input);
-            push(@{$self->{resources}},$elem41);
+            my $elem50 = undef;
+            $elem50 = new EDAMTypes::Resource();
+            $xfer += $elem50->read($input);
+            push(@{$self->{resources}},$elem50);
           }
           $xfer += $input->readListEnd();
         }
@@ -2361,15 +2693,15 @@ sub read {
       last; };
       /^15$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size42 = 0;
+          my $_size51 = 0;
           $self->{tagNames} = [];
-          my $_etype45 = 0;
-          $xfer += $input->readListBegin(\$_etype45, \$_size42);
-          for (my $_i46 = 0; $_i46 < $_size42; ++$_i46)
+          my $_etype54 = 0;
+          $xfer += $input->readListBegin(\$_etype54, \$_size51);
+          for (my $_i55 = 0; $_i55 < $_size51; ++$_i55)
           {
-            my $elem47 = undef;
-            $xfer += $input->readString(\$elem47);
-            push(@{$self->{tagNames}},$elem47);
+            my $elem56 = undef;
+            $xfer += $input->readString(\$elem56);
+            push(@{$self->{tagNames}},$elem56);
           }
           $xfer += $input->readListEnd();
         }
@@ -2449,9 +2781,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRING, scalar(@{$self->{tagGuids}}));
       {
-        foreach my $iter48 (@{$self->{tagGuids}}) 
+        foreach my $iter57 (@{$self->{tagGuids}}) 
         {
-          $xfer += $output->writeString($iter48);
+          $xfer += $output->writeString($iter57);
         }
       }
       $xfer += $output->writeListEnd();
@@ -2463,9 +2795,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{resources}}));
       {
-        foreach my $iter49 (@{$self->{resources}}) 
+        foreach my $iter58 (@{$self->{resources}}) 
         {
-          $xfer += ${iter49}->write($output);
+          $xfer += ${iter58}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -2482,9 +2814,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRING, scalar(@{$self->{tagNames}}));
       {
-        foreach my $iter50 (@{$self->{tagNames}}) 
+        foreach my $iter59 (@{$self->{tagNames}}) 
         {
-          $xfer += $output->writeString($iter50);
+          $xfer += $output->writeString($iter59);
         }
       }
       $xfer += $output->writeListEnd();
@@ -2598,6 +2930,100 @@ sub write {
   if (defined $self->{publicDescription}) {
     $xfer += $output->writeFieldBegin('publicDescription', TType::STRING, 4);
     $xfer += $output->writeString($self->{publicDescription});
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMTypes::BusinessNotebook;
+use base qw(Class::Accessor);
+EDAMTypes::BusinessNotebook->mk_accessors( qw( notebookDescription privilege recommended ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{notebookDescription} = undef;
+  $self->{privilege} = undef;
+  $self->{recommended} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{notebookDescription}) {
+      $self->{notebookDescription} = $vals->{notebookDescription};
+    }
+    if (defined $vals->{privilege}) {
+      $self->{privilege} = $vals->{privilege};
+    }
+    if (defined $vals->{recommended}) {
+      $self->{recommended} = $vals->{recommended};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'BusinessNotebook';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{notebookDescription});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{privilege});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{recommended});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('BusinessNotebook');
+  if (defined $self->{notebookDescription}) {
+    $xfer += $output->writeFieldBegin('notebookDescription', TType::STRING, 1);
+    $xfer += $output->writeString($self->{notebookDescription});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{privilege}) {
+    $xfer += $output->writeFieldBegin('privilege', TType::I32, 2);
+    $xfer += $output->writeI32($self->{privilege});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{recommended}) {
+    $xfer += $output->writeFieldBegin('recommended', TType::BOOL, 3);
+    $xfer += $output->writeBool($self->{recommended});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -2729,253 +3155,9 @@ sub write {
   return $xfer;
 }
 
-package EDAMTypes::Ad;
-use base qw(Class::Accessor);
-EDAMTypes::Ad->mk_accessors( qw( id width height advertiserName imageUrl destinationUrl displaySeconds score image imageMime html displayFrequency openInTrunk ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{id} = undef;
-  $self->{width} = undef;
-  $self->{height} = undef;
-  $self->{advertiserName} = undef;
-  $self->{imageUrl} = undef;
-  $self->{destinationUrl} = undef;
-  $self->{displaySeconds} = undef;
-  $self->{score} = undef;
-  $self->{image} = undef;
-  $self->{imageMime} = undef;
-  $self->{html} = undef;
-  $self->{displayFrequency} = undef;
-  $self->{openInTrunk} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{id}) {
-      $self->{id} = $vals->{id};
-    }
-    if (defined $vals->{width}) {
-      $self->{width} = $vals->{width};
-    }
-    if (defined $vals->{height}) {
-      $self->{height} = $vals->{height};
-    }
-    if (defined $vals->{advertiserName}) {
-      $self->{advertiserName} = $vals->{advertiserName};
-    }
-    if (defined $vals->{imageUrl}) {
-      $self->{imageUrl} = $vals->{imageUrl};
-    }
-    if (defined $vals->{destinationUrl}) {
-      $self->{destinationUrl} = $vals->{destinationUrl};
-    }
-    if (defined $vals->{displaySeconds}) {
-      $self->{displaySeconds} = $vals->{displaySeconds};
-    }
-    if (defined $vals->{score}) {
-      $self->{score} = $vals->{score};
-    }
-    if (defined $vals->{image}) {
-      $self->{image} = $vals->{image};
-    }
-    if (defined $vals->{imageMime}) {
-      $self->{imageMime} = $vals->{imageMime};
-    }
-    if (defined $vals->{html}) {
-      $self->{html} = $vals->{html};
-    }
-    if (defined $vals->{displayFrequency}) {
-      $self->{displayFrequency} = $vals->{displayFrequency};
-    }
-    if (defined $vals->{openInTrunk}) {
-      $self->{openInTrunk} = $vals->{openInTrunk};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'Ad';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^1$/ && do{      if ($ftype == TType::I32) {
-        $xfer += $input->readI32(\$self->{id});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^2$/ && do{      if ($ftype == TType::I16) {
-        $xfer += $input->readI16(\$self->{width});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^3$/ && do{      if ($ftype == TType::I16) {
-        $xfer += $input->readI16(\$self->{height});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^4$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{advertiserName});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^5$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{imageUrl});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^6$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{destinationUrl});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^7$/ && do{      if ($ftype == TType::I16) {
-        $xfer += $input->readI16(\$self->{displaySeconds});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^8$/ && do{      if ($ftype == TType::DOUBLE) {
-        $xfer += $input->readDouble(\$self->{score});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^9$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{image});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^10$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{imageMime});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^11$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{html});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^12$/ && do{      if ($ftype == TType::DOUBLE) {
-        $xfer += $input->readDouble(\$self->{displayFrequency});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^13$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{openInTrunk});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('Ad');
-  if (defined $self->{id}) {
-    $xfer += $output->writeFieldBegin('id', TType::I32, 1);
-    $xfer += $output->writeI32($self->{id});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{width}) {
-    $xfer += $output->writeFieldBegin('width', TType::I16, 2);
-    $xfer += $output->writeI16($self->{width});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{height}) {
-    $xfer += $output->writeFieldBegin('height', TType::I16, 3);
-    $xfer += $output->writeI16($self->{height});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{advertiserName}) {
-    $xfer += $output->writeFieldBegin('advertiserName', TType::STRING, 4);
-    $xfer += $output->writeString($self->{advertiserName});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{imageUrl}) {
-    $xfer += $output->writeFieldBegin('imageUrl', TType::STRING, 5);
-    $xfer += $output->writeString($self->{imageUrl});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{destinationUrl}) {
-    $xfer += $output->writeFieldBegin('destinationUrl', TType::STRING, 6);
-    $xfer += $output->writeString($self->{destinationUrl});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{displaySeconds}) {
-    $xfer += $output->writeFieldBegin('displaySeconds', TType::I16, 7);
-    $xfer += $output->writeI16($self->{displaySeconds});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{score}) {
-    $xfer += $output->writeFieldBegin('score', TType::DOUBLE, 8);
-    $xfer += $output->writeDouble($self->{score});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{image}) {
-    $xfer += $output->writeFieldBegin('image', TType::STRING, 9);
-    $xfer += $output->writeString($self->{image});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{imageMime}) {
-    $xfer += $output->writeFieldBegin('imageMime', TType::STRING, 10);
-    $xfer += $output->writeString($self->{imageMime});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{html}) {
-    $xfer += $output->writeFieldBegin('html', TType::STRING, 11);
-    $xfer += $output->writeString($self->{html});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{displayFrequency}) {
-    $xfer += $output->writeFieldBegin('displayFrequency', TType::DOUBLE, 12);
-    $xfer += $output->writeDouble($self->{displayFrequency});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{openInTrunk}) {
-    $xfer += $output->writeFieldBegin('openInTrunk', TType::BOOL, 13);
-    $xfer += $output->writeBool($self->{openInTrunk});
-    $xfer += $output->writeFieldEnd();
-  }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
 package EDAMTypes::SharedNotebook;
 use base qw(Class::Accessor);
-EDAMTypes::SharedNotebook->mk_accessors( qw( id userId notebookGuid email notebookModifiable requireLogin serviceCreated serviceUpdated shareKey username ) );
+EDAMTypes::SharedNotebook->mk_accessors( qw( id userId notebookGuid email notebookModifiable requireLogin serviceCreated serviceUpdated shareKey username privilege allowPreview ) );
 
 sub new {
   my $classname = shift;
@@ -2991,6 +3173,8 @@ sub new {
   $self->{serviceUpdated} = undef;
   $self->{shareKey} = undef;
   $self->{username} = undef;
+  $self->{privilege} = undef;
+  $self->{allowPreview} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{id}) {
       $self->{id} = $vals->{id};
@@ -3021,6 +3205,12 @@ sub new {
     }
     if (defined $vals->{username}) {
       $self->{username} = $vals->{username};
+    }
+    if (defined $vals->{privilege}) {
+      $self->{privilege} = $vals->{privilege};
+    }
+    if (defined $vals->{allowPreview}) {
+      $self->{allowPreview} = $vals->{allowPreview};
     }
   }
   return bless ($self, $classname);
@@ -3105,6 +3295,18 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^11$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{privilege});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^12$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{allowPreview});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -3167,6 +3369,365 @@ sub write {
     $xfer += $output->writeI64($self->{serviceUpdated});
     $xfer += $output->writeFieldEnd();
   }
+  if (defined $self->{privilege}) {
+    $xfer += $output->writeFieldBegin('privilege', TType::I32, 11);
+    $xfer += $output->writeI32($self->{privilege});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{allowPreview}) {
+    $xfer += $output->writeFieldBegin('allowPreview', TType::BOOL, 12);
+    $xfer += $output->writeBool($self->{allowPreview});
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMTypes::NotebookRestrictions;
+use base qw(Class::Accessor);
+EDAMTypes::NotebookRestrictions->mk_accessors( qw( noReadNotes noCreateNotes noUpdateNotes noExpungeNotes noShareNotes noEmailNotes noSendMessageToRecipients noUpdateNotebook noExpungeNotebook noSetDefaultNotebook noSetNotebookStack noPublishToPublic noPublishToBusinessLibrary noCreateTags noUpdateTags noExpungeTags noSetParentTag noCreateSharedNotebooks updateWhichSharedNotebookRestrictions expungeWhichSharedNotebookRestrictions ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{noReadNotes} = undef;
+  $self->{noCreateNotes} = undef;
+  $self->{noUpdateNotes} = undef;
+  $self->{noExpungeNotes} = undef;
+  $self->{noShareNotes} = undef;
+  $self->{noEmailNotes} = undef;
+  $self->{noSendMessageToRecipients} = undef;
+  $self->{noUpdateNotebook} = undef;
+  $self->{noExpungeNotebook} = undef;
+  $self->{noSetDefaultNotebook} = undef;
+  $self->{noSetNotebookStack} = undef;
+  $self->{noPublishToPublic} = undef;
+  $self->{noPublishToBusinessLibrary} = undef;
+  $self->{noCreateTags} = undef;
+  $self->{noUpdateTags} = undef;
+  $self->{noExpungeTags} = undef;
+  $self->{noSetParentTag} = undef;
+  $self->{noCreateSharedNotebooks} = undef;
+  $self->{updateWhichSharedNotebookRestrictions} = undef;
+  $self->{expungeWhichSharedNotebookRestrictions} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{noReadNotes}) {
+      $self->{noReadNotes} = $vals->{noReadNotes};
+    }
+    if (defined $vals->{noCreateNotes}) {
+      $self->{noCreateNotes} = $vals->{noCreateNotes};
+    }
+    if (defined $vals->{noUpdateNotes}) {
+      $self->{noUpdateNotes} = $vals->{noUpdateNotes};
+    }
+    if (defined $vals->{noExpungeNotes}) {
+      $self->{noExpungeNotes} = $vals->{noExpungeNotes};
+    }
+    if (defined $vals->{noShareNotes}) {
+      $self->{noShareNotes} = $vals->{noShareNotes};
+    }
+    if (defined $vals->{noEmailNotes}) {
+      $self->{noEmailNotes} = $vals->{noEmailNotes};
+    }
+    if (defined $vals->{noSendMessageToRecipients}) {
+      $self->{noSendMessageToRecipients} = $vals->{noSendMessageToRecipients};
+    }
+    if (defined $vals->{noUpdateNotebook}) {
+      $self->{noUpdateNotebook} = $vals->{noUpdateNotebook};
+    }
+    if (defined $vals->{noExpungeNotebook}) {
+      $self->{noExpungeNotebook} = $vals->{noExpungeNotebook};
+    }
+    if (defined $vals->{noSetDefaultNotebook}) {
+      $self->{noSetDefaultNotebook} = $vals->{noSetDefaultNotebook};
+    }
+    if (defined $vals->{noSetNotebookStack}) {
+      $self->{noSetNotebookStack} = $vals->{noSetNotebookStack};
+    }
+    if (defined $vals->{noPublishToPublic}) {
+      $self->{noPublishToPublic} = $vals->{noPublishToPublic};
+    }
+    if (defined $vals->{noPublishToBusinessLibrary}) {
+      $self->{noPublishToBusinessLibrary} = $vals->{noPublishToBusinessLibrary};
+    }
+    if (defined $vals->{noCreateTags}) {
+      $self->{noCreateTags} = $vals->{noCreateTags};
+    }
+    if (defined $vals->{noUpdateTags}) {
+      $self->{noUpdateTags} = $vals->{noUpdateTags};
+    }
+    if (defined $vals->{noExpungeTags}) {
+      $self->{noExpungeTags} = $vals->{noExpungeTags};
+    }
+    if (defined $vals->{noSetParentTag}) {
+      $self->{noSetParentTag} = $vals->{noSetParentTag};
+    }
+    if (defined $vals->{noCreateSharedNotebooks}) {
+      $self->{noCreateSharedNotebooks} = $vals->{noCreateSharedNotebooks};
+    }
+    if (defined $vals->{updateWhichSharedNotebookRestrictions}) {
+      $self->{updateWhichSharedNotebookRestrictions} = $vals->{updateWhichSharedNotebookRestrictions};
+    }
+    if (defined $vals->{expungeWhichSharedNotebookRestrictions}) {
+      $self->{expungeWhichSharedNotebookRestrictions} = $vals->{expungeWhichSharedNotebookRestrictions};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'NotebookRestrictions';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noReadNotes});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noCreateNotes});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noUpdateNotes});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^4$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noExpungeNotes});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^5$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noShareNotes});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^6$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noEmailNotes});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^7$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noSendMessageToRecipients});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^8$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noUpdateNotebook});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^9$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noExpungeNotebook});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^10$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noSetDefaultNotebook});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^11$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noSetNotebookStack});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^12$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noPublishToPublic});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^13$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noPublishToBusinessLibrary});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^14$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noCreateTags});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^15$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noUpdateTags});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^16$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noExpungeTags});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^17$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noSetParentTag});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^18$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{noCreateSharedNotebooks});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^19$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{updateWhichSharedNotebookRestrictions});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^20$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{expungeWhichSharedNotebookRestrictions});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('NotebookRestrictions');
+  if (defined $self->{noReadNotes}) {
+    $xfer += $output->writeFieldBegin('noReadNotes', TType::BOOL, 1);
+    $xfer += $output->writeBool($self->{noReadNotes});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noCreateNotes}) {
+    $xfer += $output->writeFieldBegin('noCreateNotes', TType::BOOL, 2);
+    $xfer += $output->writeBool($self->{noCreateNotes});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noUpdateNotes}) {
+    $xfer += $output->writeFieldBegin('noUpdateNotes', TType::BOOL, 3);
+    $xfer += $output->writeBool($self->{noUpdateNotes});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noExpungeNotes}) {
+    $xfer += $output->writeFieldBegin('noExpungeNotes', TType::BOOL, 4);
+    $xfer += $output->writeBool($self->{noExpungeNotes});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noShareNotes}) {
+    $xfer += $output->writeFieldBegin('noShareNotes', TType::BOOL, 5);
+    $xfer += $output->writeBool($self->{noShareNotes});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noEmailNotes}) {
+    $xfer += $output->writeFieldBegin('noEmailNotes', TType::BOOL, 6);
+    $xfer += $output->writeBool($self->{noEmailNotes});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noSendMessageToRecipients}) {
+    $xfer += $output->writeFieldBegin('noSendMessageToRecipients', TType::BOOL, 7);
+    $xfer += $output->writeBool($self->{noSendMessageToRecipients});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noUpdateNotebook}) {
+    $xfer += $output->writeFieldBegin('noUpdateNotebook', TType::BOOL, 8);
+    $xfer += $output->writeBool($self->{noUpdateNotebook});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noExpungeNotebook}) {
+    $xfer += $output->writeFieldBegin('noExpungeNotebook', TType::BOOL, 9);
+    $xfer += $output->writeBool($self->{noExpungeNotebook});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noSetDefaultNotebook}) {
+    $xfer += $output->writeFieldBegin('noSetDefaultNotebook', TType::BOOL, 10);
+    $xfer += $output->writeBool($self->{noSetDefaultNotebook});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noSetNotebookStack}) {
+    $xfer += $output->writeFieldBegin('noSetNotebookStack', TType::BOOL, 11);
+    $xfer += $output->writeBool($self->{noSetNotebookStack});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noPublishToPublic}) {
+    $xfer += $output->writeFieldBegin('noPublishToPublic', TType::BOOL, 12);
+    $xfer += $output->writeBool($self->{noPublishToPublic});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noPublishToBusinessLibrary}) {
+    $xfer += $output->writeFieldBegin('noPublishToBusinessLibrary', TType::BOOL, 13);
+    $xfer += $output->writeBool($self->{noPublishToBusinessLibrary});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noCreateTags}) {
+    $xfer += $output->writeFieldBegin('noCreateTags', TType::BOOL, 14);
+    $xfer += $output->writeBool($self->{noCreateTags});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noUpdateTags}) {
+    $xfer += $output->writeFieldBegin('noUpdateTags', TType::BOOL, 15);
+    $xfer += $output->writeBool($self->{noUpdateTags});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noExpungeTags}) {
+    $xfer += $output->writeFieldBegin('noExpungeTags', TType::BOOL, 16);
+    $xfer += $output->writeBool($self->{noExpungeTags});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noSetParentTag}) {
+    $xfer += $output->writeFieldBegin('noSetParentTag', TType::BOOL, 17);
+    $xfer += $output->writeBool($self->{noSetParentTag});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{noCreateSharedNotebooks}) {
+    $xfer += $output->writeFieldBegin('noCreateSharedNotebooks', TType::BOOL, 18);
+    $xfer += $output->writeBool($self->{noCreateSharedNotebooks});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{updateWhichSharedNotebookRestrictions}) {
+    $xfer += $output->writeFieldBegin('updateWhichSharedNotebookRestrictions', TType::I32, 19);
+    $xfer += $output->writeI32($self->{updateWhichSharedNotebookRestrictions});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{expungeWhichSharedNotebookRestrictions}) {
+    $xfer += $output->writeFieldBegin('expungeWhichSharedNotebookRestrictions', TType::I32, 20);
+    $xfer += $output->writeI32($self->{expungeWhichSharedNotebookRestrictions});
+    $xfer += $output->writeFieldEnd();
+  }
   $xfer += $output->writeFieldStop();
   $xfer += $output->writeStructEnd();
   return $xfer;
@@ -3174,7 +3735,7 @@ sub write {
 
 package EDAMTypes::Notebook;
 use base qw(Class::Accessor);
-EDAMTypes::Notebook->mk_accessors( qw( guid name updateSequenceNum defaultNotebook serviceCreated serviceUpdated publishing published stack sharedNotebookIds sharedNotebooks ) );
+EDAMTypes::Notebook->mk_accessors( qw( guid name updateSequenceNum defaultNotebook serviceCreated serviceUpdated publishing published stack sharedNotebookIds sharedNotebooks businessNotebook contact restrictions ) );
 
 sub new {
   my $classname = shift;
@@ -3191,6 +3752,9 @@ sub new {
   $self->{stack} = undef;
   $self->{sharedNotebookIds} = undef;
   $self->{sharedNotebooks} = undef;
+  $self->{businessNotebook} = undef;
+  $self->{contact} = undef;
+  $self->{restrictions} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{guid}) {
       $self->{guid} = $vals->{guid};
@@ -3224,6 +3788,15 @@ sub new {
     }
     if (defined $vals->{sharedNotebooks}) {
       $self->{sharedNotebooks} = $vals->{sharedNotebooks};
+    }
+    if (defined $vals->{businessNotebook}) {
+      $self->{businessNotebook} = $vals->{businessNotebook};
+    }
+    if (defined $vals->{contact}) {
+      $self->{contact} = $vals->{contact};
+    }
+    if (defined $vals->{restrictions}) {
+      $self->{restrictions} = $vals->{restrictions};
     }
   }
   return bless ($self, $classname);
@@ -3305,15 +3878,15 @@ sub read {
       last; };
       /^13$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size51 = 0;
+          my $_size60 = 0;
           $self->{sharedNotebookIds} = [];
-          my $_etype54 = 0;
-          $xfer += $input->readListBegin(\$_etype54, \$_size51);
-          for (my $_i55 = 0; $_i55 < $_size51; ++$_i55)
+          my $_etype63 = 0;
+          $xfer += $input->readListBegin(\$_etype63, \$_size60);
+          for (my $_i64 = 0; $_i64 < $_size60; ++$_i64)
           {
-            my $elem56 = undef;
-            $xfer += $input->readI64(\$elem56);
-            push(@{$self->{sharedNotebookIds}},$elem56);
+            my $elem65 = undef;
+            $xfer += $input->readI64(\$elem65);
+            push(@{$self->{sharedNotebookIds}},$elem65);
           }
           $xfer += $input->readListEnd();
         }
@@ -3323,19 +3896,40 @@ sub read {
       last; };
       /^14$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size57 = 0;
+          my $_size66 = 0;
           $self->{sharedNotebooks} = [];
-          my $_etype60 = 0;
-          $xfer += $input->readListBegin(\$_etype60, \$_size57);
-          for (my $_i61 = 0; $_i61 < $_size57; ++$_i61)
+          my $_etype69 = 0;
+          $xfer += $input->readListBegin(\$_etype69, \$_size66);
+          for (my $_i70 = 0; $_i70 < $_size66; ++$_i70)
           {
-            my $elem62 = undef;
-            $elem62 = new EDAMTypes::SharedNotebook();
-            $xfer += $elem62->read($input);
-            push(@{$self->{sharedNotebooks}},$elem62);
+            my $elem71 = undef;
+            $elem71 = new EDAMTypes::SharedNotebook();
+            $xfer += $elem71->read($input);
+            push(@{$self->{sharedNotebooks}},$elem71);
           }
           $xfer += $input->readListEnd();
         }
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^15$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{businessNotebook} = new EDAMTypes::BusinessNotebook();
+        $xfer += $self->{businessNotebook}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^16$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{contact} = new EDAMTypes::User();
+        $xfer += $self->{contact}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^17$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{restrictions} = new EDAMTypes::NotebookRestrictions();
+        $xfer += $self->{restrictions}->read($input);
       } else {
         $xfer += $input->skip($ftype);
       }
@@ -3402,9 +3996,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::I64, scalar(@{$self->{sharedNotebookIds}}));
       {
-        foreach my $iter63 (@{$self->{sharedNotebookIds}}) 
+        foreach my $iter72 (@{$self->{sharedNotebookIds}}) 
         {
-          $xfer += $output->writeI64($iter63);
+          $xfer += $output->writeI64($iter72);
         }
       }
       $xfer += $output->writeListEnd();
@@ -3416,13 +4010,28 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{sharedNotebooks}}));
       {
-        foreach my $iter64 (@{$self->{sharedNotebooks}}) 
+        foreach my $iter73 (@{$self->{sharedNotebooks}}) 
         {
-          $xfer += ${iter64}->write($output);
+          $xfer += ${iter73}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
     }
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{businessNotebook}) {
+    $xfer += $output->writeFieldBegin('businessNotebook', TType::STRUCT, 15);
+    $xfer += $self->{businessNotebook}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{contact}) {
+    $xfer += $output->writeFieldBegin('contact', TType::STRUCT, 16);
+    $xfer += $self->{contact}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{restrictions}) {
+    $xfer += $output->writeFieldBegin('restrictions', TType::STRUCT, 17);
+    $xfer += $self->{restrictions}->write($output);
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -3432,7 +4041,7 @@ sub write {
 
 package EDAMTypes::LinkedNotebook;
 use base qw(Class::Accessor);
-EDAMTypes::LinkedNotebook->mk_accessors( qw( shareName username shardId shareKey uri guid updateSequenceNum noteStoreUrl webApiUrlPrefix ) );
+EDAMTypes::LinkedNotebook->mk_accessors( qw( shareName username shardId shareKey uri guid updateSequenceNum noteStoreUrl webApiUrlPrefix stack businessId ) );
 
 sub new {
   my $classname = shift;
@@ -3447,6 +4056,8 @@ sub new {
   $self->{updateSequenceNum} = undef;
   $self->{noteStoreUrl} = undef;
   $self->{webApiUrlPrefix} = undef;
+  $self->{stack} = undef;
+  $self->{businessId} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{shareName}) {
       $self->{shareName} = $vals->{shareName};
@@ -3474,6 +4085,12 @@ sub new {
     }
     if (defined $vals->{webApiUrlPrefix}) {
       $self->{webApiUrlPrefix} = $vals->{webApiUrlPrefix};
+    }
+    if (defined $vals->{stack}) {
+      $self->{stack} = $vals->{stack};
+    }
+    if (defined $vals->{businessId}) {
+      $self->{businessId} = $vals->{businessId};
     }
   }
   return bless ($self, $classname);
@@ -3552,6 +4169,18 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^11$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{stack});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^12$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{businessId});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -3607,6 +4236,140 @@ sub write {
   if (defined $self->{webApiUrlPrefix}) {
     $xfer += $output->writeFieldBegin('webApiUrlPrefix', TType::STRING, 10);
     $xfer += $output->writeString($self->{webApiUrlPrefix});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{stack}) {
+    $xfer += $output->writeFieldBegin('stack', TType::STRING, 11);
+    $xfer += $output->writeString($self->{stack});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{businessId}) {
+    $xfer += $output->writeFieldBegin('businessId', TType::I32, 12);
+    $xfer += $output->writeI32($self->{businessId});
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMTypes::NotebookDescriptor;
+use base qw(Class::Accessor);
+EDAMTypes::NotebookDescriptor->mk_accessors( qw( guid notebookDisplayName contactName hasSharedNotebook joinedUserCount ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{guid} = undef;
+  $self->{notebookDisplayName} = undef;
+  $self->{contactName} = undef;
+  $self->{hasSharedNotebook} = undef;
+  $self->{joinedUserCount} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{guid}) {
+      $self->{guid} = $vals->{guid};
+    }
+    if (defined $vals->{notebookDisplayName}) {
+      $self->{notebookDisplayName} = $vals->{notebookDisplayName};
+    }
+    if (defined $vals->{contactName}) {
+      $self->{contactName} = $vals->{contactName};
+    }
+    if (defined $vals->{hasSharedNotebook}) {
+      $self->{hasSharedNotebook} = $vals->{hasSharedNotebook};
+    }
+    if (defined $vals->{joinedUserCount}) {
+      $self->{joinedUserCount} = $vals->{joinedUserCount};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'NotebookDescriptor';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{guid});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{notebookDisplayName});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{contactName});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^4$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{hasSharedNotebook});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^5$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{joinedUserCount});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('NotebookDescriptor');
+  if (defined $self->{guid}) {
+    $xfer += $output->writeFieldBegin('guid', TType::STRING, 1);
+    $xfer += $output->writeString($self->{guid});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{notebookDisplayName}) {
+    $xfer += $output->writeFieldBegin('notebookDisplayName', TType::STRING, 2);
+    $xfer += $output->writeString($self->{notebookDisplayName});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{contactName}) {
+    $xfer += $output->writeFieldBegin('contactName', TType::STRING, 3);
+    $xfer += $output->writeString($self->{contactName});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{hasSharedNotebook}) {
+    $xfer += $output->writeFieldBegin('hasSharedNotebook', TType::BOOL, 4);
+    $xfer += $output->writeBool($self->{hasSharedNotebook});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{joinedUserCount}) {
+    $xfer += $output->writeFieldBegin('joinedUserCount', TType::I32, 5);
+    $xfer += $output->writeI32($self->{joinedUserCount});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();

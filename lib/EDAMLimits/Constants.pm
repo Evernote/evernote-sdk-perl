@@ -36,6 +36,8 @@ use constant EDAM_EMAIL_DOMAIN_REGEX => "^[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*\\.([A
 
 use constant EDAM_EMAIL_REGEX => "^[A-Za-z0-9!#\$%&'*+/=?^_`{|}~-]+(\\.[A-Za-z0-9!#\$%&'*+/=?^_`{|}~-]+)*\@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*\\.([A-Za-z]{2,})\$";
 
+use constant EDAM_VAT_REGEX => "[A-Za-z]{2}.+";
+
 use constant EDAM_TIMEZONE_LEN_MIN => 1;
 
 use constant EDAM_TIMEZONE_LEN_MAX => 32;
@@ -60,6 +62,10 @@ use constant EDAM_MIME_TYPE_MP3 => "audio/mpeg";
 
 use constant EDAM_MIME_TYPE_AMR => "audio/amr";
 
+use constant EDAM_MIME_TYPE_AAC => "audio/aac";
+
+use constant EDAM_MIME_TYPE_M4A => "audio/mp4";
+
 use constant EDAM_MIME_TYPE_MP4_VIDEO => "video/mp4";
 
 use constant EDAM_MIME_TYPE_INK => "application/vnd.evernote.ink";
@@ -78,23 +84,9 @@ use constant EDAM_MIME_TYPES => [
 "application/vnd.evernote.ink" => 1,
 "application/pdf" => 1,
 "video/mp4" => 1,
+"audio/aac" => 1,
+"audio/mp4" => 1,
 ];
-
-use constant EDAM_COMMERCE_SERVICE_GOOGLE => "Google";
-
-use constant EDAM_COMMERCE_SERVICE_PAYPAL => "Paypal";
-
-use constant EDAM_COMMERCE_SERVICE_GIFT => "Gift";
-
-use constant EDAM_COMMERCE_SERVICE_TRIALPAY => "TrialPay";
-
-use constant EDAM_COMMERCE_SERVICE_TRIAL => "Trial";
-
-use constant EDAM_COMMERCE_SERVICE_GROUP => "Group";
-
-use constant EDAM_COMMERCE_SERVICE_CYBERSOURCE => "CYBERSRC";
-
-use constant EDAM_COMMERCE_DEFAULT_CURRENCY_COUNTRY_CODE => "USD";
 
 use constant EDAM_SEARCH_QUERY_LEN_MIN => 0;
 
@@ -186,17 +178,25 @@ use constant EDAM_USER_PASSWORD_LEN_MAX => 64;
 
 use constant EDAM_USER_PASSWORD_REGEX => "^[A-Za-z0-9!#\$%&'()*+,./:;<=>?\@^_`{|}~\\[\\]\\\\-]{6,64}\$";
 
+use constant EDAM_BUSINESS_URI_LEN_MAX => 32;
+
 use constant EDAM_NOTE_TAGS_MAX => 100;
 
 use constant EDAM_NOTE_RESOURCES_MAX => 1000;
 
 use constant EDAM_USER_TAGS_MAX => 100000;
 
+use constant EDAM_BUSINESS_TAGS_MAX => 100000;
+
 use constant EDAM_USER_SAVED_SEARCHES_MAX => 100;
 
 use constant EDAM_USER_NOTES_MAX => 100000;
 
+use constant EDAM_BUSINESS_NOTES_MAX => 500000;
+
 use constant EDAM_USER_NOTEBOOKS_MAX => 250;
+
+use constant EDAM_BUSINESS_NOTEBOOKS_MAX => 5000;
 
 use constant EDAM_USER_RECENT_MAILED_ADDRESSES_MAX => 10;
 
@@ -208,13 +208,15 @@ use constant EDAM_USER_UPLOAD_LIMIT_FREE => 62914560;
 
 use constant EDAM_USER_UPLOAD_LIMIT_PREMIUM => 1073741824;
 
+use constant EDAM_USER_UPLOAD_LIMIT_BUSINESS => 1073741824;
+
 use constant EDAM_NOTE_SIZE_MAX_FREE => 26214400;
 
-use constant EDAM_NOTE_SIZE_MAX_PREMIUM => 52428800;
+use constant EDAM_NOTE_SIZE_MAX_PREMIUM => 104857600;
 
 use constant EDAM_RESOURCE_SIZE_MAX_FREE => 26214400;
 
-use constant EDAM_RESOURCE_SIZE_MAX_PREMIUM => 52428800;
+use constant EDAM_RESOURCE_SIZE_MAX_PREMIUM => 104857600;
 
 use constant EDAM_USER_LINKED_NOTEBOOK_MAX => 100;
 
@@ -238,6 +240,8 @@ use constant EDAM_CONTENT_CLASS_FOOD_MEAL => "evernote.food.meal";
 
 use constant EDAM_CONTENT_CLASS_SKITCH => "evernote.skitch";
 
+use constant EDAM_CONTENT_CLASS_PENULTIMATE => "evernote.penultimate";
+
 use constant EDAM_RELATED_PLAINTEXT_LEN_MIN => 1;
 
 use constant EDAM_RELATED_PLAINTEXT_LEN_MAX => 131072;
@@ -247,5 +251,35 @@ use constant EDAM_RELATED_MAX_NOTES => 25;
 use constant EDAM_RELATED_MAX_NOTEBOOKS => 1;
 
 use constant EDAM_RELATED_MAX_TAGS => 25;
+
+use constant EDAM_BUSINESS_NOTEBOOK_DESCRIPTION_LEN_MIN => 1;
+
+use constant EDAM_BUSINESS_NOTEBOOK_DESCRIPTION_LEN_MAX => 200;
+
+use constant EDAM_BUSINESS_NOTEBOOK_DESCRIPTION_REGEX => "^[^\\p{Cc}\\p{Z}]([^\\p{Cc}\\p{Zl}\\p{Zp}]{0,198}[^\\p{Cc}\\p{Z}])?\$";
+
+use constant EDAM_PREFERENCE_NAME_LEN_MIN => 3;
+
+use constant EDAM_PREFERENCE_NAME_LEN_MAX => 32;
+
+use constant EDAM_PREFERENCE_VALUE_LEN_MIN => 1;
+
+use constant EDAM_PREFERENCE_VALUE_LEN_MAX => 1024;
+
+use constant EDAM_MAX_PREFERENCES => 100;
+
+use constant EDAM_MAX_VALUES_PER_PREFERENCE => 250;
+
+use constant EDAM_PREFERENCE_NAME_REGEX => "^[A-Za-z0-9_.-]{3,32}\$";
+
+use constant EDAM_PREFERENCE_VALUE_REGEX => "^[^\\p{Cc}]{1,1024}\$";
+
+use constant EDAM_DEVICE_ID_LEN_MAX => 32;
+
+use constant EDAM_DEVICE_ID_REGEX => "^[^\\p{Cc}]{1,32}\$";
+
+use constant EDAM_DEVICE_DESCRIPTION_LEN_MAX => 64;
+
+use constant EDAM_DEVICE_DESCRIPTION_REGEX => "^[^\\p{Cc}]{1,64}\$";
 
 1;

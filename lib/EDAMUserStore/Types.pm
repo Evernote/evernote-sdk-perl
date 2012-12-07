@@ -8,13 +8,9 @@ use strict;
 use warnings;
 use Thrift;
 
-package EDAMUserStore::SponsoredGroupRole;
-use constant GROUP_MEMBER => 1;
-use constant GROUP_ADMIN => 2;
-use constant GROUP_OWNER => 3;
 package EDAMUserStore::PublicUserInfo;
 use base qw(Class::Accessor);
-EDAMUserStore::PublicUserInfo->mk_accessors( qw( userId shardId privilege username noteStoreUrl ) );
+EDAMUserStore::PublicUserInfo->mk_accessors( qw( userId shardId privilege username noteStoreUrl webApiUrlPrefix ) );
 
 sub new {
   my $classname = shift;
@@ -25,6 +21,7 @@ sub new {
   $self->{privilege} = undef;
   $self->{username} = undef;
   $self->{noteStoreUrl} = undef;
+  $self->{webApiUrlPrefix} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{userId}) {
       $self->{userId} = $vals->{userId};
@@ -40,6 +37,9 @@ sub new {
     }
     if (defined $vals->{noteStoreUrl}) {
       $self->{noteStoreUrl} = $vals->{noteStoreUrl};
+    }
+    if (defined $vals->{webApiUrlPrefix}) {
+      $self->{webApiUrlPrefix} = $vals->{webApiUrlPrefix};
     }
   }
   return bless ($self, $classname);
@@ -94,6 +94,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^6$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{webApiUrlPrefix});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -131,233 +137,9 @@ sub write {
     $xfer += $output->writeString($self->{noteStoreUrl});
     $xfer += $output->writeFieldEnd();
   }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
-package EDAMUserStore::PremiumInfo;
-use base qw(Class::Accessor);
-EDAMUserStore::PremiumInfo->mk_accessors( qw( currentTime premium premiumRecurring premiumExpirationDate premiumExtendable premiumPending premiumCancellationPending canPurchaseUploadAllowance sponsoredGroupName sponsoredGroupRole businessName businessAdmin ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{currentTime} = undef;
-  $self->{premium} = undef;
-  $self->{premiumRecurring} = undef;
-  $self->{premiumExpirationDate} = undef;
-  $self->{premiumExtendable} = undef;
-  $self->{premiumPending} = undef;
-  $self->{premiumCancellationPending} = undef;
-  $self->{canPurchaseUploadAllowance} = undef;
-  $self->{sponsoredGroupName} = undef;
-  $self->{sponsoredGroupRole} = undef;
-  $self->{businessName} = undef;
-  $self->{businessAdmin} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{currentTime}) {
-      $self->{currentTime} = $vals->{currentTime};
-    }
-    if (defined $vals->{premium}) {
-      $self->{premium} = $vals->{premium};
-    }
-    if (defined $vals->{premiumRecurring}) {
-      $self->{premiumRecurring} = $vals->{premiumRecurring};
-    }
-    if (defined $vals->{premiumExpirationDate}) {
-      $self->{premiumExpirationDate} = $vals->{premiumExpirationDate};
-    }
-    if (defined $vals->{premiumExtendable}) {
-      $self->{premiumExtendable} = $vals->{premiumExtendable};
-    }
-    if (defined $vals->{premiumPending}) {
-      $self->{premiumPending} = $vals->{premiumPending};
-    }
-    if (defined $vals->{premiumCancellationPending}) {
-      $self->{premiumCancellationPending} = $vals->{premiumCancellationPending};
-    }
-    if (defined $vals->{canPurchaseUploadAllowance}) {
-      $self->{canPurchaseUploadAllowance} = $vals->{canPurchaseUploadAllowance};
-    }
-    if (defined $vals->{sponsoredGroupName}) {
-      $self->{sponsoredGroupName} = $vals->{sponsoredGroupName};
-    }
-    if (defined $vals->{sponsoredGroupRole}) {
-      $self->{sponsoredGroupRole} = $vals->{sponsoredGroupRole};
-    }
-    if (defined $vals->{businessName}) {
-      $self->{businessName} = $vals->{businessName};
-    }
-    if (defined $vals->{businessAdmin}) {
-      $self->{businessAdmin} = $vals->{businessAdmin};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'PremiumInfo';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^1$/ && do{      if ($ftype == TType::I64) {
-        $xfer += $input->readI64(\$self->{currentTime});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^2$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{premium});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^3$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{premiumRecurring});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^4$/ && do{      if ($ftype == TType::I64) {
-        $xfer += $input->readI64(\$self->{premiumExpirationDate});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^5$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{premiumExtendable});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^6$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{premiumPending});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^7$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{premiumCancellationPending});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^8$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{canPurchaseUploadAllowance});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^9$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{sponsoredGroupName});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^10$/ && do{      if ($ftype == TType::I32) {
-        $xfer += $input->readI32(\$self->{sponsoredGroupRole});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^11$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{businessName});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^12$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{businessAdmin});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('PremiumInfo');
-  if (defined $self->{currentTime}) {
-    $xfer += $output->writeFieldBegin('currentTime', TType::I64, 1);
-    $xfer += $output->writeI64($self->{currentTime});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{premium}) {
-    $xfer += $output->writeFieldBegin('premium', TType::BOOL, 2);
-    $xfer += $output->writeBool($self->{premium});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{premiumRecurring}) {
-    $xfer += $output->writeFieldBegin('premiumRecurring', TType::BOOL, 3);
-    $xfer += $output->writeBool($self->{premiumRecurring});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{premiumExpirationDate}) {
-    $xfer += $output->writeFieldBegin('premiumExpirationDate', TType::I64, 4);
-    $xfer += $output->writeI64($self->{premiumExpirationDate});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{premiumExtendable}) {
-    $xfer += $output->writeFieldBegin('premiumExtendable', TType::BOOL, 5);
-    $xfer += $output->writeBool($self->{premiumExtendable});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{premiumPending}) {
-    $xfer += $output->writeFieldBegin('premiumPending', TType::BOOL, 6);
-    $xfer += $output->writeBool($self->{premiumPending});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{premiumCancellationPending}) {
-    $xfer += $output->writeFieldBegin('premiumCancellationPending', TType::BOOL, 7);
-    $xfer += $output->writeBool($self->{premiumCancellationPending});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{canPurchaseUploadAllowance}) {
-    $xfer += $output->writeFieldBegin('canPurchaseUploadAllowance', TType::BOOL, 8);
-    $xfer += $output->writeBool($self->{canPurchaseUploadAllowance});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{sponsoredGroupName}) {
-    $xfer += $output->writeFieldBegin('sponsoredGroupName', TType::STRING, 9);
-    $xfer += $output->writeString($self->{sponsoredGroupName});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{sponsoredGroupRole}) {
-    $xfer += $output->writeFieldBegin('sponsoredGroupRole', TType::I32, 10);
-    $xfer += $output->writeI32($self->{sponsoredGroupRole});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{businessName}) {
-    $xfer += $output->writeFieldBegin('businessName', TType::STRING, 11);
-    $xfer += $output->writeString($self->{businessName});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{businessAdmin}) {
-    $xfer += $output->writeFieldBegin('businessAdmin', TType::BOOL, 12);
-    $xfer += $output->writeBool($self->{businessAdmin});
+  if (defined $self->{webApiUrlPrefix}) {
+    $xfer += $output->writeFieldBegin('webApiUrlPrefix', TType::STRING, 6);
+    $xfer += $output->writeString($self->{webApiUrlPrefix});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -523,7 +305,7 @@ sub write {
 
 package EDAMUserStore::BootstrapSettings;
 use base qw(Class::Accessor);
-EDAMUserStore::BootstrapSettings->mk_accessors( qw( serviceHost marketingUrl supportUrl accountEmailDomain enableFacebookSharing enableGiftSubscriptions enableSupportTickets enableSharedNotebooks enableSingleNoteSharing enableSponsoredAccounts enableTwitterSharing enableLinkedInSharing ) );
+EDAMUserStore::BootstrapSettings->mk_accessors( qw( serviceHost marketingUrl supportUrl accountEmailDomain enableFacebookSharing enableGiftSubscriptions enableSupportTickets enableSharedNotebooks enableSingleNoteSharing enableSponsoredAccounts enableTwitterSharing enableLinkedInSharing enablePublicNotebooks ) );
 
 sub new {
   my $classname = shift;
@@ -541,6 +323,7 @@ sub new {
   $self->{enableSponsoredAccounts} = undef;
   $self->{enableTwitterSharing} = undef;
   $self->{enableLinkedInSharing} = undef;
+  $self->{enablePublicNotebooks} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{serviceHost}) {
       $self->{serviceHost} = $vals->{serviceHost};
@@ -577,6 +360,9 @@ sub new {
     }
     if (defined $vals->{enableLinkedInSharing}) {
       $self->{enableLinkedInSharing} = $vals->{enableLinkedInSharing};
+    }
+    if (defined $vals->{enablePublicNotebooks}) {
+      $self->{enablePublicNotebooks} = $vals->{enablePublicNotebooks};
     }
   }
   return bless ($self, $classname);
@@ -673,6 +459,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^13$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{enablePublicNotebooks});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -743,6 +535,11 @@ sub write {
   if (defined $self->{enableLinkedInSharing}) {
     $xfer += $output->writeFieldBegin('enableLinkedInSharing', TType::BOOL, 12);
     $xfer += $output->writeBool($self->{enableLinkedInSharing});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{enablePublicNotebooks}) {
+    $xfer += $output->writeFieldBegin('enablePublicNotebooks', TType::BOOL, 13);
+    $xfer += $output->writeBool($self->{enablePublicNotebooks});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();

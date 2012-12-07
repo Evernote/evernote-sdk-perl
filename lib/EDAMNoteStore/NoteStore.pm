@@ -1304,16 +1304,16 @@ sub read {
     {
       /^0$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size202 = 0;
+          my $_size193 = 0;
           $self->{success} = [];
-          my $_etype205 = 0;
-          $xfer += $input->readListBegin(\$_etype205, \$_size202);
-          for (my $_i206 = 0; $_i206 < $_size202; ++$_i206)
+          my $_etype196 = 0;
+          $xfer += $input->readListBegin(\$_etype196, \$_size193);
+          for (my $_i197 = 0; $_i197 < $_size193; ++$_i197)
           {
-            my $elem207 = undef;
-            $elem207 = new EDAMTypes::Notebook();
-            $xfer += $elem207->read($input);
-            push(@{$self->{success}},$elem207);
+            my $elem198 = undef;
+            $elem198 = new EDAMTypes::Notebook();
+            $xfer += $elem198->read($input);
+            push(@{$self->{success}},$elem198);
           }
           $xfer += $input->readListEnd();
         }
@@ -1352,9 +1352,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{success}}));
       {
-        foreach my $iter208 (@{$self->{success}}) 
+        foreach my $iter199 (@{$self->{success}}) 
         {
-          $xfer += ${iter208}->write($output);
+          $xfer += ${iter199}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -2399,16 +2399,16 @@ sub read {
     {
       /^0$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size209 = 0;
+          my $_size200 = 0;
           $self->{success} = [];
-          my $_etype212 = 0;
-          $xfer += $input->readListBegin(\$_etype212, \$_size209);
-          for (my $_i213 = 0; $_i213 < $_size209; ++$_i213)
+          my $_etype203 = 0;
+          $xfer += $input->readListBegin(\$_etype203, \$_size200);
+          for (my $_i204 = 0; $_i204 < $_size200; ++$_i204)
           {
-            my $elem214 = undef;
-            $elem214 = new EDAMTypes::Tag();
-            $xfer += $elem214->read($input);
-            push(@{$self->{success}},$elem214);
+            my $elem205 = undef;
+            $elem205 = new EDAMTypes::Tag();
+            $xfer += $elem205->read($input);
+            push(@{$self->{success}},$elem205);
           }
           $xfer += $input->readListEnd();
         }
@@ -2447,9 +2447,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{success}}));
       {
-        foreach my $iter215 (@{$self->{success}}) 
+        foreach my $iter206 (@{$self->{success}}) 
         {
-          $xfer += ${iter215}->write($output);
+          $xfer += ${iter206}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -2600,16 +2600,16 @@ sub read {
     {
       /^0$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size216 = 0;
+          my $_size207 = 0;
           $self->{success} = [];
-          my $_etype219 = 0;
-          $xfer += $input->readListBegin(\$_etype219, \$_size216);
-          for (my $_i220 = 0; $_i220 < $_size216; ++$_i220)
+          my $_etype210 = 0;
+          $xfer += $input->readListBegin(\$_etype210, \$_size207);
+          for (my $_i211 = 0; $_i211 < $_size207; ++$_i211)
           {
-            my $elem221 = undef;
-            $elem221 = new EDAMTypes::Tag();
-            $xfer += $elem221->read($input);
-            push(@{$self->{success}},$elem221);
+            my $elem212 = undef;
+            $elem212 = new EDAMTypes::Tag();
+            $xfer += $elem212->read($input);
+            push(@{$self->{success}},$elem212);
           }
           $xfer += $input->readListEnd();
         }
@@ -2655,9 +2655,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{success}}));
       {
-        foreach my $iter222 (@{$self->{success}}) 
+        foreach my $iter213 (@{$self->{success}}) 
         {
-          $xfer += ${iter222}->write($output);
+          $xfer += ${iter213}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -3738,16 +3738,16 @@ sub read {
     {
       /^0$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size223 = 0;
+          my $_size214 = 0;
           $self->{success} = [];
-          my $_etype226 = 0;
-          $xfer += $input->readListBegin(\$_etype226, \$_size223);
-          for (my $_i227 = 0; $_i227 < $_size223; ++$_i227)
+          my $_etype217 = 0;
+          $xfer += $input->readListBegin(\$_etype217, \$_size214);
+          for (my $_i218 = 0; $_i218 < $_size214; ++$_i218)
           {
-            my $elem228 = undef;
-            $elem228 = new EDAMTypes::SavedSearch();
-            $xfer += $elem228->read($input);
-            push(@{$self->{success}},$elem228);
+            my $elem219 = undef;
+            $elem219 = new EDAMTypes::SavedSearch();
+            $xfer += $elem219->read($input);
+            push(@{$self->{success}},$elem219);
           }
           $xfer += $input->readListEnd();
         }
@@ -3786,9 +3786,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{success}}));
       {
-        foreach my $iter229 (@{$self->{success}}) 
+        foreach my $iter220 (@{$self->{success}}) 
         {
-          $xfer += ${iter229}->write($output);
+          $xfer += ${iter220}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -7248,15 +7248,15 @@ sub read {
     {
       /^0$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size230 = 0;
+          my $_size221 = 0;
           $self->{success} = [];
-          my $_etype233 = 0;
-          $xfer += $input->readListBegin(\$_etype233, \$_size230);
-          for (my $_i234 = 0; $_i234 < $_size230; ++$_i234)
+          my $_etype224 = 0;
+          $xfer += $input->readListBegin(\$_etype224, \$_size221);
+          for (my $_i225 = 0; $_i225 < $_size221; ++$_i225)
           {
-            my $elem235 = undef;
-            $xfer += $input->readString(\$elem235);
-            push(@{$self->{success}},$elem235);
+            my $elem226 = undef;
+            $xfer += $input->readString(\$elem226);
+            push(@{$self->{success}},$elem226);
           }
           $xfer += $input->readListEnd();
         }
@@ -7302,9 +7302,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRING, scalar(@{$self->{success}}));
       {
-        foreach my $iter236 (@{$self->{success}}) 
+        foreach my $iter227 (@{$self->{success}}) 
         {
-          $xfer += $output->writeString($iter236);
+          $xfer += $output->writeString($iter227);
         }
       }
       $xfer += $output->writeListEnd();
@@ -8147,15 +8147,15 @@ sub read {
       last; };
       /^2$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size237 = 0;
+          my $_size228 = 0;
           $self->{noteGuids} = [];
-          my $_etype240 = 0;
-          $xfer += $input->readListBegin(\$_etype240, \$_size237);
-          for (my $_i241 = 0; $_i241 < $_size237; ++$_i241)
+          my $_etype231 = 0;
+          $xfer += $input->readListBegin(\$_etype231, \$_size228);
+          for (my $_i232 = 0; $_i232 < $_size228; ++$_i232)
           {
-            my $elem242 = undef;
-            $xfer += $input->readString(\$elem242);
-            push(@{$self->{noteGuids}},$elem242);
+            my $elem233 = undef;
+            $xfer += $input->readString(\$elem233);
+            push(@{$self->{noteGuids}},$elem233);
           }
           $xfer += $input->readListEnd();
         }
@@ -8185,9 +8185,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRING, scalar(@{$self->{noteGuids}}));
       {
-        foreach my $iter243 (@{$self->{noteGuids}}) 
+        foreach my $iter234 (@{$self->{noteGuids}}) 
         {
-          $xfer += $output->writeString($iter243);
+          $xfer += $output->writeString($iter234);
         }
       }
       $xfer += $output->writeListEnd();
@@ -8807,16 +8807,16 @@ sub read {
     {
       /^0$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size244 = 0;
+          my $_size235 = 0;
           $self->{success} = [];
-          my $_etype247 = 0;
-          $xfer += $input->readListBegin(\$_etype247, \$_size244);
-          for (my $_i248 = 0; $_i248 < $_size244; ++$_i248)
+          my $_etype238 = 0;
+          $xfer += $input->readListBegin(\$_etype238, \$_size235);
+          for (my $_i239 = 0; $_i239 < $_size235; ++$_i239)
           {
-            my $elem249 = undef;
-            $elem249 = new EDAMNoteStore::NoteVersionId();
-            $xfer += $elem249->read($input);
-            push(@{$self->{success}},$elem249);
+            my $elem240 = undef;
+            $elem240 = new EDAMNoteStore::NoteVersionId();
+            $xfer += $elem240->read($input);
+            push(@{$self->{success}},$elem240);
           }
           $xfer += $input->readListEnd();
         }
@@ -8862,9 +8862,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{success}}));
       {
-        foreach my $iter250 (@{$self->{success}}) 
+        foreach my $iter241 (@{$self->{success}}) 
         {
-          $xfer += ${iter250}->write($output);
+          $xfer += ${iter241}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -11429,541 +11429,6 @@ sub write {
   return $xfer;
 }
 
-package EDAMNoteStore::NoteStore_getAccountSize_args;
-use base qw(Class::Accessor);
-EDAMNoteStore::NoteStore_getAccountSize_args->mk_accessors( qw( authenticationToken ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{authenticationToken} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{authenticationToken}) {
-      $self->{authenticationToken} = $vals->{authenticationToken};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'NoteStore_getAccountSize_args';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^1$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{authenticationToken});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('NoteStore_getAccountSize_args');
-  if (defined $self->{authenticationToken}) {
-    $xfer += $output->writeFieldBegin('authenticationToken', TType::STRING, 1);
-    $xfer += $output->writeString($self->{authenticationToken});
-    $xfer += $output->writeFieldEnd();
-  }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
-package EDAMNoteStore::NoteStore_getAccountSize_result;
-use base qw(Class::Accessor);
-EDAMNoteStore::NoteStore_getAccountSize_result->mk_accessors( qw( success ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{success} = undef;
-  $self->{userException} = undef;
-  $self->{systemException} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{success}) {
-      $self->{success} = $vals->{success};
-    }
-    if (defined $vals->{userException}) {
-      $self->{userException} = $vals->{userException};
-    }
-    if (defined $vals->{systemException}) {
-      $self->{systemException} = $vals->{systemException};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'NoteStore_getAccountSize_result';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^0$/ && do{      if ($ftype == TType::I64) {
-        $xfer += $input->readI64(\$self->{success});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^1$/ && do{      if ($ftype == TType::STRUCT) {
-        $self->{userException} = new EDAMErrors::EDAMUserException();
-        $xfer += $self->{userException}->read($input);
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^2$/ && do{      if ($ftype == TType::STRUCT) {
-        $self->{systemException} = new EDAMErrors::EDAMSystemException();
-        $xfer += $self->{systemException}->read($input);
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('NoteStore_getAccountSize_result');
-  if (defined $self->{success}) {
-    $xfer += $output->writeFieldBegin('success', TType::I64, 0);
-    $xfer += $output->writeI64($self->{success});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{userException}) {
-    $xfer += $output->writeFieldBegin('userException', TType::STRUCT, 1);
-    $xfer += $self->{userException}->write($output);
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{systemException}) {
-    $xfer += $output->writeFieldBegin('systemException', TType::STRUCT, 2);
-    $xfer += $self->{systemException}->write($output);
-    $xfer += $output->writeFieldEnd();
-  }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
-package EDAMNoteStore::NoteStore_getAds_args;
-use base qw(Class::Accessor);
-EDAMNoteStore::NoteStore_getAds_args->mk_accessors( qw( authenticationToken adParameters ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{authenticationToken} = undef;
-  $self->{adParameters} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{authenticationToken}) {
-      $self->{authenticationToken} = $vals->{authenticationToken};
-    }
-    if (defined $vals->{adParameters}) {
-      $self->{adParameters} = $vals->{adParameters};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'NoteStore_getAds_args';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^1$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{authenticationToken});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^2$/ && do{      if ($ftype == TType::STRUCT) {
-        $self->{adParameters} = new EDAMNoteStore::AdParameters();
-        $xfer += $self->{adParameters}->read($input);
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('NoteStore_getAds_args');
-  if (defined $self->{authenticationToken}) {
-    $xfer += $output->writeFieldBegin('authenticationToken', TType::STRING, 1);
-    $xfer += $output->writeString($self->{authenticationToken});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{adParameters}) {
-    $xfer += $output->writeFieldBegin('adParameters', TType::STRUCT, 2);
-    $xfer += $self->{adParameters}->write($output);
-    $xfer += $output->writeFieldEnd();
-  }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
-package EDAMNoteStore::NoteStore_getAds_result;
-use base qw(Class::Accessor);
-EDAMNoteStore::NoteStore_getAds_result->mk_accessors( qw( success ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{success} = undef;
-  $self->{userException} = undef;
-  $self->{systemException} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{success}) {
-      $self->{success} = $vals->{success};
-    }
-    if (defined $vals->{userException}) {
-      $self->{userException} = $vals->{userException};
-    }
-    if (defined $vals->{systemException}) {
-      $self->{systemException} = $vals->{systemException};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'NoteStore_getAds_result';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^0$/ && do{      if ($ftype == TType::LIST) {
-        {
-          my $_size251 = 0;
-          $self->{success} = [];
-          my $_etype254 = 0;
-          $xfer += $input->readListBegin(\$_etype254, \$_size251);
-          for (my $_i255 = 0; $_i255 < $_size251; ++$_i255)
-          {
-            my $elem256 = undef;
-            $elem256 = new EDAMTypes::Ad();
-            $xfer += $elem256->read($input);
-            push(@{$self->{success}},$elem256);
-          }
-          $xfer += $input->readListEnd();
-        }
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^1$/ && do{      if ($ftype == TType::STRUCT) {
-        $self->{userException} = new EDAMErrors::EDAMUserException();
-        $xfer += $self->{userException}->read($input);
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^2$/ && do{      if ($ftype == TType::STRUCT) {
-        $self->{systemException} = new EDAMErrors::EDAMSystemException();
-        $xfer += $self->{systemException}->read($input);
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('NoteStore_getAds_result');
-  if (defined $self->{success}) {
-    $xfer += $output->writeFieldBegin('success', TType::LIST, 0);
-    {
-      $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{success}}));
-      {
-        foreach my $iter257 (@{$self->{success}}) 
-        {
-          $xfer += ${iter257}->write($output);
-        }
-      }
-      $xfer += $output->writeListEnd();
-    }
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{userException}) {
-    $xfer += $output->writeFieldBegin('userException', TType::STRUCT, 1);
-    $xfer += $self->{userException}->write($output);
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{systemException}) {
-    $xfer += $output->writeFieldBegin('systemException', TType::STRUCT, 2);
-    $xfer += $self->{systemException}->write($output);
-    $xfer += $output->writeFieldEnd();
-  }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
-package EDAMNoteStore::NoteStore_getRandomAd_args;
-use base qw(Class::Accessor);
-EDAMNoteStore::NoteStore_getRandomAd_args->mk_accessors( qw( authenticationToken adParameters ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{authenticationToken} = undef;
-  $self->{adParameters} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{authenticationToken}) {
-      $self->{authenticationToken} = $vals->{authenticationToken};
-    }
-    if (defined $vals->{adParameters}) {
-      $self->{adParameters} = $vals->{adParameters};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'NoteStore_getRandomAd_args';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^1$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{authenticationToken});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^2$/ && do{      if ($ftype == TType::STRUCT) {
-        $self->{adParameters} = new EDAMNoteStore::AdParameters();
-        $xfer += $self->{adParameters}->read($input);
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('NoteStore_getRandomAd_args');
-  if (defined $self->{authenticationToken}) {
-    $xfer += $output->writeFieldBegin('authenticationToken', TType::STRING, 1);
-    $xfer += $output->writeString($self->{authenticationToken});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{adParameters}) {
-    $xfer += $output->writeFieldBegin('adParameters', TType::STRUCT, 2);
-    $xfer += $self->{adParameters}->write($output);
-    $xfer += $output->writeFieldEnd();
-  }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
-package EDAMNoteStore::NoteStore_getRandomAd_result;
-use base qw(Class::Accessor);
-EDAMNoteStore::NoteStore_getRandomAd_result->mk_accessors( qw( success ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{success} = undef;
-  $self->{userException} = undef;
-  $self->{systemException} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{success}) {
-      $self->{success} = $vals->{success};
-    }
-    if (defined $vals->{userException}) {
-      $self->{userException} = $vals->{userException};
-    }
-    if (defined $vals->{systemException}) {
-      $self->{systemException} = $vals->{systemException};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'NoteStore_getRandomAd_result';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^0$/ && do{      if ($ftype == TType::STRUCT) {
-        $self->{success} = new EDAMTypes::Ad();
-        $xfer += $self->{success}->read($input);
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^1$/ && do{      if ($ftype == TType::STRUCT) {
-        $self->{userException} = new EDAMErrors::EDAMUserException();
-        $xfer += $self->{userException}->read($input);
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^2$/ && do{      if ($ftype == TType::STRUCT) {
-        $self->{systemException} = new EDAMErrors::EDAMSystemException();
-        $xfer += $self->{systemException}->read($input);
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('NoteStore_getRandomAd_result');
-  if (defined $self->{success}) {
-    $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
-    $xfer += $self->{success}->write($output);
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{userException}) {
-    $xfer += $output->writeFieldBegin('userException', TType::STRUCT, 1);
-    $xfer += $self->{userException}->write($output);
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{systemException}) {
-    $xfer += $output->writeFieldBegin('systemException', TType::STRUCT, 2);
-    $xfer += $self->{systemException}->write($output);
-    $xfer += $output->writeFieldEnd();
-  }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
 package EDAMNoteStore::NoteStore_getPublicNotebook_args;
 use base qw(Class::Accessor);
 EDAMNoteStore::NoteStore_getPublicNotebook_args->mk_accessors( qw( userId publicUri ) );
@@ -12333,6 +11798,198 @@ sub write {
   return $xfer;
 }
 
+package EDAMNoteStore::NoteStore_updateSharedNotebook_args;
+use base qw(Class::Accessor);
+EDAMNoteStore::NoteStore_updateSharedNotebook_args->mk_accessors( qw( authenticationToken sharedNotebook ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{authenticationToken} = undef;
+  $self->{sharedNotebook} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{authenticationToken}) {
+      $self->{authenticationToken} = $vals->{authenticationToken};
+    }
+    if (defined $vals->{sharedNotebook}) {
+      $self->{sharedNotebook} = $vals->{sharedNotebook};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'NoteStore_updateSharedNotebook_args';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{authenticationToken});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{sharedNotebook} = new EDAMTypes::SharedNotebook();
+        $xfer += $self->{sharedNotebook}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('NoteStore_updateSharedNotebook_args');
+  if (defined $self->{authenticationToken}) {
+    $xfer += $output->writeFieldBegin('authenticationToken', TType::STRING, 1);
+    $xfer += $output->writeString($self->{authenticationToken});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{sharedNotebook}) {
+    $xfer += $output->writeFieldBegin('sharedNotebook', TType::STRUCT, 2);
+    $xfer += $self->{sharedNotebook}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMNoteStore::NoteStore_updateSharedNotebook_result;
+use base qw(Class::Accessor);
+EDAMNoteStore::NoteStore_updateSharedNotebook_result->mk_accessors( qw( success ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{success} = undef;
+  $self->{userException} = undef;
+  $self->{notFoundException} = undef;
+  $self->{systemException} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{success}) {
+      $self->{success} = $vals->{success};
+    }
+    if (defined $vals->{userException}) {
+      $self->{userException} = $vals->{userException};
+    }
+    if (defined $vals->{notFoundException}) {
+      $self->{notFoundException} = $vals->{notFoundException};
+    }
+    if (defined $vals->{systemException}) {
+      $self->{systemException} = $vals->{systemException};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'NoteStore_updateSharedNotebook_result';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^0$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{success});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^1$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{userException} = new EDAMErrors::EDAMUserException();
+        $xfer += $self->{userException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{notFoundException} = new EDAMErrors::EDAMNotFoundException();
+        $xfer += $self->{notFoundException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{systemException} = new EDAMErrors::EDAMSystemException();
+        $xfer += $self->{systemException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('NoteStore_updateSharedNotebook_result');
+  if (defined $self->{success}) {
+    $xfer += $output->writeFieldBegin('success', TType::I32, 0);
+    $xfer += $output->writeI32($self->{success});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{userException}) {
+    $xfer += $output->writeFieldBegin('userException', TType::STRUCT, 1);
+    $xfer += $self->{userException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{notFoundException}) {
+    $xfer += $output->writeFieldBegin('notFoundException', TType::STRUCT, 2);
+    $xfer += $self->{notFoundException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{systemException}) {
+    $xfer += $output->writeFieldBegin('systemException', TType::STRUCT, 3);
+    $xfer += $self->{systemException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
 package EDAMNoteStore::NoteStore_sendMessageToSharedNotebookMembers_args;
 use base qw(Class::Accessor);
 EDAMNoteStore::NoteStore_sendMessageToSharedNotebookMembers_args->mk_accessors( qw( authenticationToken notebookGuid messageText recipients ) );
@@ -12401,15 +12058,15 @@ sub read {
       last; };
       /^4$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size258 = 0;
+          my $_size242 = 0;
           $self->{recipients} = [];
-          my $_etype261 = 0;
-          $xfer += $input->readListBegin(\$_etype261, \$_size258);
-          for (my $_i262 = 0; $_i262 < $_size258; ++$_i262)
+          my $_etype245 = 0;
+          $xfer += $input->readListBegin(\$_etype245, \$_size242);
+          for (my $_i246 = 0; $_i246 < $_size242; ++$_i246)
           {
-            my $elem263 = undef;
-            $xfer += $input->readString(\$elem263);
-            push(@{$self->{recipients}},$elem263);
+            my $elem247 = undef;
+            $xfer += $input->readString(\$elem247);
+            push(@{$self->{recipients}},$elem247);
           }
           $xfer += $input->readListEnd();
         }
@@ -12449,9 +12106,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRING, scalar(@{$self->{recipients}}));
       {
-        foreach my $iter264 (@{$self->{recipients}}) 
+        foreach my $iter248 (@{$self->{recipients}}) 
         {
-          $xfer += $output->writeString($iter264);
+          $xfer += $output->writeString($iter248);
         }
       }
       $xfer += $output->writeListEnd();
@@ -12689,16 +12346,16 @@ sub read {
     {
       /^0$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size265 = 0;
+          my $_size249 = 0;
           $self->{success} = [];
-          my $_etype268 = 0;
-          $xfer += $input->readListBegin(\$_etype268, \$_size265);
-          for (my $_i269 = 0; $_i269 < $_size265; ++$_i269)
+          my $_etype252 = 0;
+          $xfer += $input->readListBegin(\$_etype252, \$_size249);
+          for (my $_i253 = 0; $_i253 < $_size249; ++$_i253)
           {
-            my $elem270 = undef;
-            $elem270 = new EDAMTypes::SharedNotebook();
-            $xfer += $elem270->read($input);
-            push(@{$self->{success}},$elem270);
+            my $elem254 = undef;
+            $elem254 = new EDAMTypes::SharedNotebook();
+            $xfer += $elem254->read($input);
+            push(@{$self->{success}},$elem254);
           }
           $xfer += $input->readListEnd();
         }
@@ -12744,9 +12401,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{success}}));
       {
-        foreach my $iter271 (@{$self->{success}}) 
+        foreach my $iter255 (@{$self->{success}}) 
         {
-          $xfer += ${iter271}->write($output);
+          $xfer += ${iter255}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -12821,15 +12478,15 @@ sub read {
       last; };
       /^2$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size272 = 0;
+          my $_size256 = 0;
           $self->{sharedNotebookIds} = [];
-          my $_etype275 = 0;
-          $xfer += $input->readListBegin(\$_etype275, \$_size272);
-          for (my $_i276 = 0; $_i276 < $_size272; ++$_i276)
+          my $_etype259 = 0;
+          $xfer += $input->readListBegin(\$_etype259, \$_size256);
+          for (my $_i260 = 0; $_i260 < $_size256; ++$_i260)
           {
-            my $elem277 = undef;
-            $xfer += $input->readI64(\$elem277);
-            push(@{$self->{sharedNotebookIds}},$elem277);
+            my $elem261 = undef;
+            $xfer += $input->readI64(\$elem261);
+            push(@{$self->{sharedNotebookIds}},$elem261);
           }
           $xfer += $input->readListEnd();
         }
@@ -12859,9 +12516,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::I64, scalar(@{$self->{sharedNotebookIds}}));
       {
-        foreach my $iter278 (@{$self->{sharedNotebookIds}}) 
+        foreach my $iter262 (@{$self->{sharedNotebookIds}}) 
         {
-          $xfer += $output->writeI64($iter278);
+          $xfer += $output->writeI64($iter262);
         }
       }
       $xfer += $output->writeListEnd();
@@ -13484,16 +13141,16 @@ sub read {
     {
       /^0$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size279 = 0;
+          my $_size263 = 0;
           $self->{success} = [];
-          my $_etype282 = 0;
-          $xfer += $input->readListBegin(\$_etype282, \$_size279);
-          for (my $_i283 = 0; $_i283 < $_size279; ++$_i283)
+          my $_etype266 = 0;
+          $xfer += $input->readListBegin(\$_etype266, \$_size263);
+          for (my $_i267 = 0; $_i267 < $_size263; ++$_i267)
           {
-            my $elem284 = undef;
-            $elem284 = new EDAMTypes::LinkedNotebook();
-            $xfer += $elem284->read($input);
-            push(@{$self->{success}},$elem284);
+            my $elem268 = undef;
+            $elem268 = new EDAMTypes::LinkedNotebook();
+            $xfer += $elem268->read($input);
+            push(@{$self->{success}},$elem268);
           }
           $xfer += $input->readListEnd();
         }
@@ -13539,9 +13196,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{success}}));
       {
-        foreach my $iter285 (@{$self->{success}}) 
+        foreach my $iter269 (@{$self->{success}}) 
         {
-          $xfer += ${iter285}->write($output);
+          $xfer += ${iter269}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -15569,29 +15226,6 @@ sub getResourceAttributes{
   die 'implement interface';
 }
 
-sub getAccountSize{
-  my $self = shift;
-  my $authenticationToken = shift;
-
-  die 'implement interface';
-}
-
-sub getAds{
-  my $self = shift;
-  my $authenticationToken = shift;
-  my $adParameters = shift;
-
-  die 'implement interface';
-}
-
-sub getRandomAd{
-  my $self = shift;
-  my $authenticationToken = shift;
-  my $adParameters = shift;
-
-  die 'implement interface';
-}
-
 sub getPublicNotebook{
   my $self = shift;
   my $userId = shift;
@@ -15601,6 +15235,14 @@ sub getPublicNotebook{
 }
 
 sub createSharedNotebook{
+  my $self = shift;
+  my $authenticationToken = shift;
+  my $sharedNotebook = shift;
+
+  die 'implement interface';
+}
+
+sub updateSharedNotebook{
   my $self = shift;
   my $authenticationToken = shift;
   my $sharedNotebook = shift;
@@ -16223,29 +15865,6 @@ sub getResourceAttributes{
   return $self->{impl}->getResourceAttributes($authenticationToken, $guid);
 }
 
-sub getAccountSize{
-  my ($self, $request) = @_;
-
-  my $authenticationToken = ($request->{'authenticationToken'}) ? $request->{'authenticationToken'} : undef;
-  return $self->{impl}->getAccountSize($authenticationToken);
-}
-
-sub getAds{
-  my ($self, $request) = @_;
-
-  my $authenticationToken = ($request->{'authenticationToken'}) ? $request->{'authenticationToken'} : undef;
-  my $adParameters = ($request->{'adParameters'}) ? $request->{'adParameters'} : undef;
-  return $self->{impl}->getAds($authenticationToken, $adParameters);
-}
-
-sub getRandomAd{
-  my ($self, $request) = @_;
-
-  my $authenticationToken = ($request->{'authenticationToken'}) ? $request->{'authenticationToken'} : undef;
-  my $adParameters = ($request->{'adParameters'}) ? $request->{'adParameters'} : undef;
-  return $self->{impl}->getRandomAd($authenticationToken, $adParameters);
-}
-
 sub getPublicNotebook{
   my ($self, $request) = @_;
 
@@ -16260,6 +15879,14 @@ sub createSharedNotebook{
   my $authenticationToken = ($request->{'authenticationToken'}) ? $request->{'authenticationToken'} : undef;
   my $sharedNotebook = ($request->{'sharedNotebook'}) ? $request->{'sharedNotebook'} : undef;
   return $self->{impl}->createSharedNotebook($authenticationToken, $sharedNotebook);
+}
+
+sub updateSharedNotebook{
+  my ($self, $request) = @_;
+
+  my $authenticationToken = ($request->{'authenticationToken'}) ? $request->{'authenticationToken'} : undef;
+  my $sharedNotebook = ($request->{'sharedNotebook'}) ? $request->{'sharedNotebook'} : undef;
+  return $self->{impl}->updateSharedNotebook($authenticationToken, $sharedNotebook);
 }
 
 sub sendMessageToSharedNotebookMembers{
@@ -19591,159 +19218,6 @@ sub recv_getResourceAttributes{
   }
   die "getResourceAttributes failed: unknown result";
 }
-sub getAccountSize{
-  my $self = shift;
-  my $authenticationToken = shift;
-
-    $self->send_getAccountSize($authenticationToken);
-  return $self->recv_getAccountSize();
-}
-
-sub send_getAccountSize{
-  my $self = shift;
-  my $authenticationToken = shift;
-
-  $self->{output}->writeMessageBegin('getAccountSize', TMessageType::CALL, $self->{seqid});
-  my $args = new EDAMNoteStore::NoteStore_getAccountSize_args();
-  $args->{authenticationToken} = $authenticationToken;
-  $args->write($self->{output});
-  $self->{output}->writeMessageEnd();
-  $self->{output}->getTransport()->flush();
-}
-
-sub recv_getAccountSize{
-  my $self = shift;
-
-  my $rseqid = 0;
-  my $fname;
-  my $mtype = 0;
-
-  $self->{input}->readMessageBegin(\$fname, \$mtype, \$rseqid);
-  if ($mtype == TMessageType::EXCEPTION) {
-    my $x = new TApplicationException();
-    $x->read($self->{input});
-    $self->{input}->readMessageEnd();
-    die $x;
-  }
-  my $result = new EDAMNoteStore::NoteStore_getAccountSize_result();
-  $result->read($self->{input});
-  $self->{input}->readMessageEnd();
-
-  if (defined $result->{success} ) {
-    return $result->{success};
-  }
-  if (defined $result->{userException}) {
-    die $result->{userException};
-  }
-  if (defined $result->{systemException}) {
-    die $result->{systemException};
-  }
-  die "getAccountSize failed: unknown result";
-}
-sub getAds{
-  my $self = shift;
-  my $authenticationToken = shift;
-  my $adParameters = shift;
-
-    $self->send_getAds($authenticationToken, $adParameters);
-  return $self->recv_getAds();
-}
-
-sub send_getAds{
-  my $self = shift;
-  my $authenticationToken = shift;
-  my $adParameters = shift;
-
-  $self->{output}->writeMessageBegin('getAds', TMessageType::CALL, $self->{seqid});
-  my $args = new EDAMNoteStore::NoteStore_getAds_args();
-  $args->{authenticationToken} = $authenticationToken;
-  $args->{adParameters} = $adParameters;
-  $args->write($self->{output});
-  $self->{output}->writeMessageEnd();
-  $self->{output}->getTransport()->flush();
-}
-
-sub recv_getAds{
-  my $self = shift;
-
-  my $rseqid = 0;
-  my $fname;
-  my $mtype = 0;
-
-  $self->{input}->readMessageBegin(\$fname, \$mtype, \$rseqid);
-  if ($mtype == TMessageType::EXCEPTION) {
-    my $x = new TApplicationException();
-    $x->read($self->{input});
-    $self->{input}->readMessageEnd();
-    die $x;
-  }
-  my $result = new EDAMNoteStore::NoteStore_getAds_result();
-  $result->read($self->{input});
-  $self->{input}->readMessageEnd();
-
-  if (defined $result->{success} ) {
-    return $result->{success};
-  }
-  if (defined $result->{userException}) {
-    die $result->{userException};
-  }
-  if (defined $result->{systemException}) {
-    die $result->{systemException};
-  }
-  die "getAds failed: unknown result";
-}
-sub getRandomAd{
-  my $self = shift;
-  my $authenticationToken = shift;
-  my $adParameters = shift;
-
-    $self->send_getRandomAd($authenticationToken, $adParameters);
-  return $self->recv_getRandomAd();
-}
-
-sub send_getRandomAd{
-  my $self = shift;
-  my $authenticationToken = shift;
-  my $adParameters = shift;
-
-  $self->{output}->writeMessageBegin('getRandomAd', TMessageType::CALL, $self->{seqid});
-  my $args = new EDAMNoteStore::NoteStore_getRandomAd_args();
-  $args->{authenticationToken} = $authenticationToken;
-  $args->{adParameters} = $adParameters;
-  $args->write($self->{output});
-  $self->{output}->writeMessageEnd();
-  $self->{output}->getTransport()->flush();
-}
-
-sub recv_getRandomAd{
-  my $self = shift;
-
-  my $rseqid = 0;
-  my $fname;
-  my $mtype = 0;
-
-  $self->{input}->readMessageBegin(\$fname, \$mtype, \$rseqid);
-  if ($mtype == TMessageType::EXCEPTION) {
-    my $x = new TApplicationException();
-    $x->read($self->{input});
-    $self->{input}->readMessageEnd();
-    die $x;
-  }
-  my $result = new EDAMNoteStore::NoteStore_getRandomAd_result();
-  $result->read($self->{input});
-  $self->{input}->readMessageEnd();
-
-  if (defined $result->{success} ) {
-    return $result->{success};
-  }
-  if (defined $result->{userException}) {
-    die $result->{userException};
-  }
-  if (defined $result->{systemException}) {
-    die $result->{systemException};
-  }
-  die "getRandomAd failed: unknown result";
-}
 sub getPublicNotebook{
   my $self = shift;
   my $userId = shift;
@@ -19850,6 +19324,61 @@ sub recv_createSharedNotebook{
     die $result->{systemException};
   }
   die "createSharedNotebook failed: unknown result";
+}
+sub updateSharedNotebook{
+  my $self = shift;
+  my $authenticationToken = shift;
+  my $sharedNotebook = shift;
+
+    $self->send_updateSharedNotebook($authenticationToken, $sharedNotebook);
+  return $self->recv_updateSharedNotebook();
+}
+
+sub send_updateSharedNotebook{
+  my $self = shift;
+  my $authenticationToken = shift;
+  my $sharedNotebook = shift;
+
+  $self->{output}->writeMessageBegin('updateSharedNotebook', TMessageType::CALL, $self->{seqid});
+  my $args = new EDAMNoteStore::NoteStore_updateSharedNotebook_args();
+  $args->{authenticationToken} = $authenticationToken;
+  $args->{sharedNotebook} = $sharedNotebook;
+  $args->write($self->{output});
+  $self->{output}->writeMessageEnd();
+  $self->{output}->getTransport()->flush();
+}
+
+sub recv_updateSharedNotebook{
+  my $self = shift;
+
+  my $rseqid = 0;
+  my $fname;
+  my $mtype = 0;
+
+  $self->{input}->readMessageBegin(\$fname, \$mtype, \$rseqid);
+  if ($mtype == TMessageType::EXCEPTION) {
+    my $x = new TApplicationException();
+    $x->read($self->{input});
+    $self->{input}->readMessageEnd();
+    die $x;
+  }
+  my $result = new EDAMNoteStore::NoteStore_updateSharedNotebook_result();
+  $result->read($self->{input});
+  $self->{input}->readMessageEnd();
+
+  if (defined $result->{success} ) {
+    return $result->{success};
+  }
+  if (defined $result->{userException}) {
+    die $result->{userException};
+  }
+  if (defined $result->{notFoundException}) {
+    die $result->{notFoundException};
+  }
+  if (defined $result->{systemException}) {
+    die $result->{systemException};
+  }
+  die "updateSharedNotebook failed: unknown result";
 }
 sub sendMessageToSharedNotebookMembers{
   my $self = shift;
@@ -21824,63 +21353,6 @@ sub process_getResourceAttributes {
     $output->getTransport()->flush();
 }
 
-sub process_getAccountSize {
-    my ($self, $seqid, $input, $output) = @_;
-    my $args = new EDAMNoteStore::NoteStore_getAccountSize_args();
-    $args->read($input);
-    $input->readMessageEnd();
-    my $result = new EDAMNoteStore::NoteStore_getAccountSize_result();
-    eval {
-      $result->{success} = $self->{handler}->getAccountSize($args->authenticationToken);
-    }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
-      $result->{userException} = $@;
-        }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMSystemException') ){ 
-      $result->{systemException} = $@;
-    }
-    $output->writeMessageBegin('getAccountSize', TMessageType::REPLY, $seqid);
-    $result->write($output);
-    $output->writeMessageEnd();
-    $output->getTransport()->flush();
-}
-
-sub process_getAds {
-    my ($self, $seqid, $input, $output) = @_;
-    my $args = new EDAMNoteStore::NoteStore_getAds_args();
-    $args->read($input);
-    $input->readMessageEnd();
-    my $result = new EDAMNoteStore::NoteStore_getAds_result();
-    eval {
-      $result->{success} = $self->{handler}->getAds($args->authenticationToken, $args->adParameters);
-    }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
-      $result->{userException} = $@;
-        }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMSystemException') ){ 
-      $result->{systemException} = $@;
-    }
-    $output->writeMessageBegin('getAds', TMessageType::REPLY, $seqid);
-    $result->write($output);
-    $output->writeMessageEnd();
-    $output->getTransport()->flush();
-}
-
-sub process_getRandomAd {
-    my ($self, $seqid, $input, $output) = @_;
-    my $args = new EDAMNoteStore::NoteStore_getRandomAd_args();
-    $args->read($input);
-    $input->readMessageEnd();
-    my $result = new EDAMNoteStore::NoteStore_getRandomAd_result();
-    eval {
-      $result->{success} = $self->{handler}->getRandomAd($args->authenticationToken, $args->adParameters);
-    }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
-      $result->{userException} = $@;
-        }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMSystemException') ){ 
-      $result->{systemException} = $@;
-    }
-    $output->writeMessageBegin('getRandomAd', TMessageType::REPLY, $seqid);
-    $result->write($output);
-    $output->writeMessageEnd();
-    $output->getTransport()->flush();
-}
-
 sub process_getPublicNotebook {
     my ($self, $seqid, $input, $output) = @_;
     my $args = new EDAMNoteStore::NoteStore_getPublicNotebook_args();
@@ -21916,6 +21388,27 @@ sub process_createSharedNotebook {
       $result->{systemException} = $@;
     }
     $output->writeMessageBegin('createSharedNotebook', TMessageType::REPLY, $seqid);
+    $result->write($output);
+    $output->writeMessageEnd();
+    $output->getTransport()->flush();
+}
+
+sub process_updateSharedNotebook {
+    my ($self, $seqid, $input, $output) = @_;
+    my $args = new EDAMNoteStore::NoteStore_updateSharedNotebook_args();
+    $args->read($input);
+    $input->readMessageEnd();
+    my $result = new EDAMNoteStore::NoteStore_updateSharedNotebook_result();
+    eval {
+      $result->{success} = $self->{handler}->updateSharedNotebook($args->authenticationToken, $args->sharedNotebook);
+    }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
+      $result->{userException} = $@;
+        }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMNotFoundException') ){ 
+      $result->{notFoundException} = $@;
+        }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMSystemException') ){ 
+      $result->{systemException} = $@;
+    }
+    $output->writeMessageBegin('updateSharedNotebook', TMessageType::REPLY, $seqid);
     $result->write($output);
     $output->writeMessageEnd();
     $output->getTransport()->flush();

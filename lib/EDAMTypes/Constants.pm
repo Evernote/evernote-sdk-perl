@@ -10,6 +10,12 @@ use warnings;
 use Thrift;
 
 
+use constant CLASSIFICATION_RECIPE_USER_NON_RECIPE => "000";
+
+use constant CLASSIFICATION_RECIPE_USER_RECIPE => "001";
+
+use constant CLASSIFICATION_RECIPE_SERVICE_RECIPE => "002";
+
 use constant EDAM_NOTE_SOURCE_WEB_CLIP => "web.clip";
 
 use constant EDAM_NOTE_SOURCE_MAIL_CLIP => "mail.clip";

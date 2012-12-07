@@ -859,7 +859,7 @@ sub write {
 
 package EDAMNoteStore::NoteFilter;
 use base qw(Class::Accessor);
-EDAMNoteStore::NoteFilter->mk_accessors( qw( order ascending words notebookGuid tagGuids timeZone inactive ) );
+EDAMNoteStore::NoteFilter->mk_accessors( qw( order ascending words notebookGuid tagGuids timeZone inactive emphasized ) );
 
 sub new {
   my $classname = shift;
@@ -872,6 +872,7 @@ sub new {
   $self->{tagGuids} = undef;
   $self->{timeZone} = undef;
   $self->{inactive} = undef;
+  $self->{emphasized} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{order}) {
       $self->{order} = $vals->{order};
@@ -893,6 +894,9 @@ sub new {
     }
     if (defined $vals->{inactive}) {
       $self->{inactive} = $vals->{inactive};
+    }
+    if (defined $vals->{emphasized}) {
+      $self->{emphasized} = $vals->{emphasized};
     }
   }
   return bless ($self, $classname);
@@ -971,6 +975,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^8$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{emphasized});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -1025,6 +1035,11 @@ sub write {
   if (defined $self->{inactive}) {
     $xfer += $output->writeFieldBegin('inactive', TType::BOOL, 7);
     $xfer += $output->writeBool($self->{inactive});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{emphasized}) {
+    $xfer += $output->writeFieldBegin('emphasized', TType::STRING, 8);
+    $xfer += $output->writeString($self->{emphasized});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -2017,256 +2032,6 @@ sub write {
   return $xfer;
 }
 
-package EDAMNoteStore::AdImpressions;
-use base qw(Class::Accessor);
-EDAMNoteStore::AdImpressions->mk_accessors( qw( adId impressionCount impressionTime ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{adId} = undef;
-  $self->{impressionCount} = undef;
-  $self->{impressionTime} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{adId}) {
-      $self->{adId} = $vals->{adId};
-    }
-    if (defined $vals->{impressionCount}) {
-      $self->{impressionCount} = $vals->{impressionCount};
-    }
-    if (defined $vals->{impressionTime}) {
-      $self->{impressionTime} = $vals->{impressionTime};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'AdImpressions';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^1$/ && do{      if ($ftype == TType::I32) {
-        $xfer += $input->readI32(\$self->{adId});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^2$/ && do{      if ($ftype == TType::I32) {
-        $xfer += $input->readI32(\$self->{impressionCount});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^3$/ && do{      if ($ftype == TType::I32) {
-        $xfer += $input->readI32(\$self->{impressionTime});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('AdImpressions');
-  if (defined $self->{adId}) {
-    $xfer += $output->writeFieldBegin('adId', TType::I32, 1);
-    $xfer += $output->writeI32($self->{adId});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{impressionCount}) {
-    $xfer += $output->writeFieldBegin('impressionCount', TType::I32, 2);
-    $xfer += $output->writeI32($self->{impressionCount});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{impressionTime}) {
-    $xfer += $output->writeFieldBegin('impressionTime', TType::I32, 3);
-    $xfer += $output->writeI32($self->{impressionTime});
-    $xfer += $output->writeFieldEnd();
-  }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
-package EDAMNoteStore::AdParameters;
-use base qw(Class::Accessor);
-EDAMNoteStore::AdParameters->mk_accessors( qw( clientLanguage impressions supportHtml clientProperties ) );
-
-sub new {
-  my $classname = shift;
-  my $self      = {};
-  my $vals      = shift || {};
-  $self->{clientLanguage} = undef;
-  $self->{impressions} = undef;
-  $self->{supportHtml} = undef;
-  $self->{clientProperties} = undef;
-  if (UNIVERSAL::isa($vals,'HASH')) {
-    if (defined $vals->{clientLanguage}) {
-      $self->{clientLanguage} = $vals->{clientLanguage};
-    }
-    if (defined $vals->{impressions}) {
-      $self->{impressions} = $vals->{impressions};
-    }
-    if (defined $vals->{supportHtml}) {
-      $self->{supportHtml} = $vals->{supportHtml};
-    }
-    if (defined $vals->{clientProperties}) {
-      $self->{clientProperties} = $vals->{clientProperties};
-    }
-  }
-  return bless ($self, $classname);
-}
-
-sub getName {
-  return 'AdParameters';
-}
-
-sub read {
-  my ($self, $input) = @_;
-  my $xfer  = 0;
-  my $fname;
-  my $ftype = 0;
-  my $fid   = 0;
-  $xfer += $input->readStructBegin(\$fname);
-  while (1) 
-  {
-    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
-    if ($ftype == TType::STOP) {
-      last;
-    }
-    SWITCH: for($fid)
-    {
-      /^2$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{clientLanguage});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^4$/ && do{      if ($ftype == TType::LIST) {
-        {
-          my $_size151 = 0;
-          $self->{impressions} = [];
-          my $_etype154 = 0;
-          $xfer += $input->readListBegin(\$_etype154, \$_size151);
-          for (my $_i155 = 0; $_i155 < $_size151; ++$_i155)
-          {
-            my $elem156 = undef;
-            $elem156 = new EDAMNoteStore::AdImpressions();
-            $xfer += $elem156->read($input);
-            push(@{$self->{impressions}},$elem156);
-          }
-          $xfer += $input->readListEnd();
-        }
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^5$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{supportHtml});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-      /^6$/ && do{      if ($ftype == TType::MAP) {
-        {
-          my $_size157 = 0;
-          $self->{clientProperties} = {};
-          my $_ktype158 = 0;
-          my $_vtype159 = 0;
-          $xfer += $input->readMapBegin(\$_ktype158, \$_vtype159, \$_size157);
-          for (my $_i161 = 0; $_i161 < $_size157; ++$_i161)
-          {
-            my $key162 = '';
-            my $val163 = '';
-            $xfer += $input->readString(\$key162);
-            $xfer += $input->readString(\$val163);
-            $self->{clientProperties}->{$key162} = $val163;
-          }
-          $xfer += $input->readMapEnd();
-        }
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
-        $xfer += $input->skip($ftype);
-    }
-    $xfer += $input->readFieldEnd();
-  }
-  $xfer += $input->readStructEnd();
-  return $xfer;
-}
-
-sub write {
-  my ($self, $output) = @_;
-  my $xfer   = 0;
-  $xfer += $output->writeStructBegin('AdParameters');
-  if (defined $self->{clientLanguage}) {
-    $xfer += $output->writeFieldBegin('clientLanguage', TType::STRING, 2);
-    $xfer += $output->writeString($self->{clientLanguage});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{impressions}) {
-    $xfer += $output->writeFieldBegin('impressions', TType::LIST, 4);
-    {
-      $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{impressions}}));
-      {
-        foreach my $iter164 (@{$self->{impressions}}) 
-        {
-          $xfer += ${iter164}->write($output);
-        }
-      }
-      $xfer += $output->writeListEnd();
-    }
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{supportHtml}) {
-    $xfer += $output->writeFieldBegin('supportHtml', TType::BOOL, 5);
-    $xfer += $output->writeBool($self->{supportHtml});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{clientProperties}) {
-    $xfer += $output->writeFieldBegin('clientProperties', TType::MAP, 6);
-    {
-      $xfer += $output->writeMapBegin(TType::STRING, TType::STRING, scalar(keys %{$self->{clientProperties}}));
-      {
-        while( my ($kiter165,$viter166) = each %{$self->{clientProperties}}) 
-        {
-          $xfer += $output->writeString($kiter165);
-          $xfer += $output->writeString($viter166);
-        }
-      }
-      $xfer += $output->writeMapEnd();
-    }
-    $xfer += $output->writeFieldEnd();
-  }
-  $xfer += $output->writeFieldStop();
-  $xfer += $output->writeStructEnd();
-  return $xfer;
-}
-
 package EDAMNoteStore::NoteEmailParameters;
 use base qw(Class::Accessor);
 EDAMNoteStore::NoteEmailParameters->mk_accessors( qw( guid note toAddresses ccAddresses subject message ) );
@@ -2338,15 +2103,15 @@ sub read {
       last; };
       /^3$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size167 = 0;
+          my $_size151 = 0;
           $self->{toAddresses} = [];
-          my $_etype170 = 0;
-          $xfer += $input->readListBegin(\$_etype170, \$_size167);
-          for (my $_i171 = 0; $_i171 < $_size167; ++$_i171)
+          my $_etype154 = 0;
+          $xfer += $input->readListBegin(\$_etype154, \$_size151);
+          for (my $_i155 = 0; $_i155 < $_size151; ++$_i155)
           {
-            my $elem172 = undef;
-            $xfer += $input->readString(\$elem172);
-            push(@{$self->{toAddresses}},$elem172);
+            my $elem156 = undef;
+            $xfer += $input->readString(\$elem156);
+            push(@{$self->{toAddresses}},$elem156);
           }
           $xfer += $input->readListEnd();
         }
@@ -2356,15 +2121,15 @@ sub read {
       last; };
       /^4$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size173 = 0;
+          my $_size157 = 0;
           $self->{ccAddresses} = [];
-          my $_etype176 = 0;
-          $xfer += $input->readListBegin(\$_etype176, \$_size173);
-          for (my $_i177 = 0; $_i177 < $_size173; ++$_i177)
+          my $_etype160 = 0;
+          $xfer += $input->readListBegin(\$_etype160, \$_size157);
+          for (my $_i161 = 0; $_i161 < $_size157; ++$_i161)
           {
-            my $elem178 = undef;
-            $xfer += $input->readString(\$elem178);
-            push(@{$self->{ccAddresses}},$elem178);
+            my $elem162 = undef;
+            $xfer += $input->readString(\$elem162);
+            push(@{$self->{ccAddresses}},$elem162);
           }
           $xfer += $input->readListEnd();
         }
@@ -2411,9 +2176,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRING, scalar(@{$self->{toAddresses}}));
       {
-        foreach my $iter179 (@{$self->{toAddresses}}) 
+        foreach my $iter163 (@{$self->{toAddresses}}) 
         {
-          $xfer += $output->writeString($iter179);
+          $xfer += $output->writeString($iter163);
         }
       }
       $xfer += $output->writeListEnd();
@@ -2425,9 +2190,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRING, scalar(@{$self->{ccAddresses}}));
       {
-        foreach my $iter180 (@{$self->{ccAddresses}}) 
+        foreach my $iter164 (@{$self->{ccAddresses}}) 
         {
-          $xfer += $output->writeString($iter180);
+          $xfer += $output->writeString($iter164);
         }
       }
       $xfer += $output->writeListEnd();
@@ -2624,7 +2389,7 @@ sub write {
 
 package EDAMNoteStore::RelatedQuery;
 use base qw(Class::Accessor);
-EDAMNoteStore::RelatedQuery->mk_accessors( qw( noteGuid plainText ) );
+EDAMNoteStore::RelatedQuery->mk_accessors( qw( noteGuid plainText filter ) );
 
 sub new {
   my $classname = shift;
@@ -2632,12 +2397,16 @@ sub new {
   my $vals      = shift || {};
   $self->{noteGuid} = undef;
   $self->{plainText} = undef;
+  $self->{filter} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{noteGuid}) {
       $self->{noteGuid} = $vals->{noteGuid};
     }
     if (defined $vals->{plainText}) {
       $self->{plainText} = $vals->{plainText};
+    }
+    if (defined $vals->{filter}) {
+      $self->{filter} = $vals->{filter};
     }
   }
   return bless ($self, $classname);
@@ -2674,6 +2443,13 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^3$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{filter} = new EDAMNoteStore::NoteFilter();
+        $xfer += $self->{filter}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -2696,6 +2472,11 @@ sub write {
     $xfer += $output->writeString($self->{plainText});
     $xfer += $output->writeFieldEnd();
   }
+  if (defined $self->{filter}) {
+    $xfer += $output->writeFieldBegin('filter', TType::STRUCT, 3);
+    $xfer += $self->{filter}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
   $xfer += $output->writeFieldStop();
   $xfer += $output->writeStructEnd();
   return $xfer;
@@ -2703,7 +2484,7 @@ sub write {
 
 package EDAMNoteStore::RelatedResult;
 use base qw(Class::Accessor);
-EDAMNoteStore::RelatedResult->mk_accessors( qw( notes notebooks tags ) );
+EDAMNoteStore::RelatedResult->mk_accessors( qw( notes notebooks tags containingNotebooks debugInfo ) );
 
 sub new {
   my $classname = shift;
@@ -2712,6 +2493,8 @@ sub new {
   $self->{notes} = undef;
   $self->{notebooks} = undef;
   $self->{tags} = undef;
+  $self->{containingNotebooks} = undef;
+  $self->{debugInfo} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{notes}) {
       $self->{notes} = $vals->{notes};
@@ -2721,6 +2504,12 @@ sub new {
     }
     if (defined $vals->{tags}) {
       $self->{tags} = $vals->{tags};
+    }
+    if (defined $vals->{containingNotebooks}) {
+      $self->{containingNotebooks} = $vals->{containingNotebooks};
+    }
+    if (defined $vals->{debugInfo}) {
+      $self->{debugInfo} = $vals->{debugInfo};
     }
   }
   return bless ($self, $classname);
@@ -2747,16 +2536,16 @@ sub read {
     {
       /^1$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size181 = 0;
+          my $_size165 = 0;
           $self->{notes} = [];
-          my $_etype184 = 0;
-          $xfer += $input->readListBegin(\$_etype184, \$_size181);
-          for (my $_i185 = 0; $_i185 < $_size181; ++$_i185)
+          my $_etype168 = 0;
+          $xfer += $input->readListBegin(\$_etype168, \$_size165);
+          for (my $_i169 = 0; $_i169 < $_size165; ++$_i169)
           {
-            my $elem186 = undef;
-            $elem186 = new EDAMTypes::Note();
-            $xfer += $elem186->read($input);
-            push(@{$self->{notes}},$elem186);
+            my $elem170 = undef;
+            $elem170 = new EDAMTypes::Note();
+            $xfer += $elem170->read($input);
+            push(@{$self->{notes}},$elem170);
           }
           $xfer += $input->readListEnd();
         }
@@ -2766,16 +2555,16 @@ sub read {
       last; };
       /^2$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size187 = 0;
+          my $_size171 = 0;
           $self->{notebooks} = [];
-          my $_etype190 = 0;
-          $xfer += $input->readListBegin(\$_etype190, \$_size187);
-          for (my $_i191 = 0; $_i191 < $_size187; ++$_i191)
+          my $_etype174 = 0;
+          $xfer += $input->readListBegin(\$_etype174, \$_size171);
+          for (my $_i175 = 0; $_i175 < $_size171; ++$_i175)
           {
-            my $elem192 = undef;
-            $elem192 = new EDAMTypes::Notebook();
-            $xfer += $elem192->read($input);
-            push(@{$self->{notebooks}},$elem192);
+            my $elem176 = undef;
+            $elem176 = new EDAMTypes::Notebook();
+            $xfer += $elem176->read($input);
+            push(@{$self->{notebooks}},$elem176);
           }
           $xfer += $input->readListEnd();
         }
@@ -2785,19 +2574,44 @@ sub read {
       last; };
       /^3$/ && do{      if ($ftype == TType::LIST) {
         {
-          my $_size193 = 0;
+          my $_size177 = 0;
           $self->{tags} = [];
-          my $_etype196 = 0;
-          $xfer += $input->readListBegin(\$_etype196, \$_size193);
-          for (my $_i197 = 0; $_i197 < $_size193; ++$_i197)
+          my $_etype180 = 0;
+          $xfer += $input->readListBegin(\$_etype180, \$_size177);
+          for (my $_i181 = 0; $_i181 < $_size177; ++$_i181)
           {
-            my $elem198 = undef;
-            $elem198 = new EDAMTypes::Tag();
-            $xfer += $elem198->read($input);
-            push(@{$self->{tags}},$elem198);
+            my $elem182 = undef;
+            $elem182 = new EDAMTypes::Tag();
+            $xfer += $elem182->read($input);
+            push(@{$self->{tags}},$elem182);
           }
           $xfer += $input->readListEnd();
         }
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^4$/ && do{      if ($ftype == TType::LIST) {
+        {
+          my $_size183 = 0;
+          $self->{containingNotebooks} = [];
+          my $_etype186 = 0;
+          $xfer += $input->readListBegin(\$_etype186, \$_size183);
+          for (my $_i187 = 0; $_i187 < $_size183; ++$_i187)
+          {
+            my $elem188 = undef;
+            $elem188 = new EDAMTypes::NotebookDescriptor();
+            $xfer += $elem188->read($input);
+            push(@{$self->{containingNotebooks}},$elem188);
+          }
+          $xfer += $input->readListEnd();
+        }
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^5$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{debugInfo});
       } else {
         $xfer += $input->skip($ftype);
       }
@@ -2819,9 +2633,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{notes}}));
       {
-        foreach my $iter199 (@{$self->{notes}}) 
+        foreach my $iter189 (@{$self->{notes}}) 
         {
-          $xfer += ${iter199}->write($output);
+          $xfer += ${iter189}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -2833,9 +2647,9 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{notebooks}}));
       {
-        foreach my $iter200 (@{$self->{notebooks}}) 
+        foreach my $iter190 (@{$self->{notebooks}}) 
         {
-          $xfer += ${iter200}->write($output);
+          $xfer += ${iter190}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
@@ -2847,13 +2661,32 @@ sub write {
     {
       $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{tags}}));
       {
-        foreach my $iter201 (@{$self->{tags}}) 
+        foreach my $iter191 (@{$self->{tags}}) 
         {
-          $xfer += ${iter201}->write($output);
+          $xfer += ${iter191}->write($output);
         }
       }
       $xfer += $output->writeListEnd();
     }
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{containingNotebooks}) {
+    $xfer += $output->writeFieldBegin('containingNotebooks', TType::LIST, 4);
+    {
+      $xfer += $output->writeListBegin(TType::STRUCT, scalar(@{$self->{containingNotebooks}}));
+      {
+        foreach my $iter192 (@{$self->{containingNotebooks}}) 
+        {
+          $xfer += ${iter192}->write($output);
+        }
+      }
+      $xfer += $output->writeListEnd();
+    }
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{debugInfo}) {
+    $xfer += $output->writeFieldBegin('debugInfo', TType::STRING, 5);
+    $xfer += $output->writeString($self->{debugInfo});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -2863,7 +2696,7 @@ sub write {
 
 package EDAMNoteStore::RelatedResultSpec;
 use base qw(Class::Accessor);
-EDAMNoteStore::RelatedResultSpec->mk_accessors( qw( maxNotes maxNotebooks maxTags ) );
+EDAMNoteStore::RelatedResultSpec->mk_accessors( qw( maxNotes maxNotebooks maxTags writableNotebooksOnly includeContainingNotebooks includeDebugInfo ) );
 
 sub new {
   my $classname = shift;
@@ -2872,6 +2705,9 @@ sub new {
   $self->{maxNotes} = undef;
   $self->{maxNotebooks} = undef;
   $self->{maxTags} = undef;
+  $self->{writableNotebooksOnly} = undef;
+  $self->{includeContainingNotebooks} = undef;
+  $self->{includeDebugInfo} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{maxNotes}) {
       $self->{maxNotes} = $vals->{maxNotes};
@@ -2881,6 +2717,15 @@ sub new {
     }
     if (defined $vals->{maxTags}) {
       $self->{maxTags} = $vals->{maxTags};
+    }
+    if (defined $vals->{writableNotebooksOnly}) {
+      $self->{writableNotebooksOnly} = $vals->{writableNotebooksOnly};
+    }
+    if (defined $vals->{includeContainingNotebooks}) {
+      $self->{includeContainingNotebooks} = $vals->{includeContainingNotebooks};
+    }
+    if (defined $vals->{includeDebugInfo}) {
+      $self->{includeDebugInfo} = $vals->{includeDebugInfo};
     }
   }
   return bless ($self, $classname);
@@ -2923,6 +2768,24 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^4$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{writableNotebooksOnly});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^5$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{includeContainingNotebooks});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^6$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{includeDebugInfo});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -2948,6 +2811,21 @@ sub write {
   if (defined $self->{maxTags}) {
     $xfer += $output->writeFieldBegin('maxTags', TType::I32, 3);
     $xfer += $output->writeI32($self->{maxTags});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{writableNotebooksOnly}) {
+    $xfer += $output->writeFieldBegin('writableNotebooksOnly', TType::BOOL, 4);
+    $xfer += $output->writeBool($self->{writableNotebooksOnly});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{includeContainingNotebooks}) {
+    $xfer += $output->writeFieldBegin('includeContainingNotebooks', TType::BOOL, 5);
+    $xfer += $output->writeBool($self->{includeContainingNotebooks});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{includeDebugInfo}) {
+    $xfer += $output->writeFieldBegin('includeDebugInfo', TType::BOOL, 6);
+    $xfer += $output->writeBool($self->{includeDebugInfo});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
