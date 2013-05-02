@@ -1252,7 +1252,7 @@ sub write {
 
 package EDAMNoteStore::NoteMetadata;
 use base qw(Class::Accessor);
-EDAMNoteStore::NoteMetadata->mk_accessors( qw( guid title contentLength created updated updateSequenceNum notebookGuid tagGuids attributes largestResourceMime largestResourceSize ) );
+EDAMNoteStore::NoteMetadata->mk_accessors( qw( guid title contentLength created updated deleted updateSequenceNum notebookGuid tagGuids attributes largestResourceMime largestResourceSize ) );
 
 sub new {
   my $classname = shift;
@@ -1263,6 +1263,7 @@ sub new {
   $self->{contentLength} = undef;
   $self->{created} = undef;
   $self->{updated} = undef;
+  $self->{deleted} = undef;
   $self->{updateSequenceNum} = undef;
   $self->{notebookGuid} = undef;
   $self->{tagGuids} = undef;
@@ -1284,6 +1285,9 @@ sub new {
     }
     if (defined $vals->{updated}) {
       $self->{updated} = $vals->{updated};
+    }
+    if (defined $vals->{deleted}) {
+      $self->{deleted} = $vals->{deleted};
     }
     if (defined $vals->{updateSequenceNum}) {
       $self->{updateSequenceNum} = $vals->{updateSequenceNum};
@@ -1352,6 +1356,12 @@ sub read {
       last; };
       /^7$/ && do{      if ($ftype == TType::I64) {
         $xfer += $input->readI64(\$self->{updated});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^8$/ && do{      if ($ftype == TType::I64) {
+        $xfer += $input->readI64(\$self->{deleted});
       } else {
         $xfer += $input->skip($ftype);
       }
@@ -1440,6 +1450,11 @@ sub write {
   if (defined $self->{updated}) {
     $xfer += $output->writeFieldBegin('updated', TType::I64, 7);
     $xfer += $output->writeI64($self->{updated});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{deleted}) {
+    $xfer += $output->writeFieldBegin('deleted', TType::I64, 8);
+    $xfer += $output->writeI64($self->{deleted});
     $xfer += $output->writeFieldEnd();
   }
   if (defined $self->{updateSequenceNum}) {
@@ -1691,7 +1706,7 @@ sub write {
 
 package EDAMNoteStore::NotesMetadataResultSpec;
 use base qw(Class::Accessor);
-EDAMNoteStore::NotesMetadataResultSpec->mk_accessors( qw( includeTitle includeContentLength includeCreated includeUpdated includeUpdateSequenceNum includeNotebookGuid includeTagGuids includeAttributes includeLargestResourceMime includeLargestResourceSize ) );
+EDAMNoteStore::NotesMetadataResultSpec->mk_accessors( qw( includeTitle includeContentLength includeCreated includeUpdated includeDeleted includeUpdateSequenceNum includeNotebookGuid includeTagGuids includeAttributes includeLargestResourceMime includeLargestResourceSize ) );
 
 sub new {
   my $classname = shift;
@@ -1701,6 +1716,7 @@ sub new {
   $self->{includeContentLength} = undef;
   $self->{includeCreated} = undef;
   $self->{includeUpdated} = undef;
+  $self->{includeDeleted} = undef;
   $self->{includeUpdateSequenceNum} = undef;
   $self->{includeNotebookGuid} = undef;
   $self->{includeTagGuids} = undef;
@@ -1719,6 +1735,9 @@ sub new {
     }
     if (defined $vals->{includeUpdated}) {
       $self->{includeUpdated} = $vals->{includeUpdated};
+    }
+    if (defined $vals->{includeDeleted}) {
+      $self->{includeDeleted} = $vals->{includeDeleted};
     }
     if (defined $vals->{includeUpdateSequenceNum}) {
       $self->{includeUpdateSequenceNum} = $vals->{includeUpdateSequenceNum};
@@ -1781,6 +1800,12 @@ sub read {
       last; };
       /^7$/ && do{      if ($ftype == TType::BOOL) {
         $xfer += $input->readBool(\$self->{includeUpdated});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^8$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{includeDeleted});
       } else {
         $xfer += $input->skip($ftype);
       }
@@ -1851,6 +1876,11 @@ sub write {
   if (defined $self->{includeUpdated}) {
     $xfer += $output->writeFieldBegin('includeUpdated', TType::BOOL, 7);
     $xfer += $output->writeBool($self->{includeUpdated});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{includeDeleted}) {
+    $xfer += $output->writeFieldBegin('includeDeleted', TType::BOOL, 8);
+    $xfer += $output->writeBool($self->{includeDeleted});
     $xfer += $output->writeFieldEnd();
   }
   if (defined $self->{includeUpdateSequenceNum}) {
@@ -2484,7 +2514,7 @@ sub write {
 
 package EDAMNoteStore::RelatedResult;
 use base qw(Class::Accessor);
-EDAMNoteStore::RelatedResult->mk_accessors( qw( notes notebooks tags containingNotebooks debugInfo ) );
+EDAMNoteStore::RelatedResult->mk_accessors( qw( notes notebooks tags containingNotebooks ) );
 
 sub new {
   my $classname = shift;
@@ -2494,7 +2524,6 @@ sub new {
   $self->{notebooks} = undef;
   $self->{tags} = undef;
   $self->{containingNotebooks} = undef;
-  $self->{debugInfo} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{notes}) {
       $self->{notes} = $vals->{notes};
@@ -2507,9 +2536,6 @@ sub new {
     }
     if (defined $vals->{containingNotebooks}) {
       $self->{containingNotebooks} = $vals->{containingNotebooks};
-    }
-    if (defined $vals->{debugInfo}) {
-      $self->{debugInfo} = $vals->{debugInfo};
     }
   }
   return bless ($self, $classname);
@@ -2610,12 +2636,6 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
-      /^5$/ && do{      if ($ftype == TType::STRING) {
-        $xfer += $input->readString(\$self->{debugInfo});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -2684,11 +2704,6 @@ sub write {
     }
     $xfer += $output->writeFieldEnd();
   }
-  if (defined $self->{debugInfo}) {
-    $xfer += $output->writeFieldBegin('debugInfo', TType::STRING, 5);
-    $xfer += $output->writeString($self->{debugInfo});
-    $xfer += $output->writeFieldEnd();
-  }
   $xfer += $output->writeFieldStop();
   $xfer += $output->writeStructEnd();
   return $xfer;
@@ -2696,7 +2711,7 @@ sub write {
 
 package EDAMNoteStore::RelatedResultSpec;
 use base qw(Class::Accessor);
-EDAMNoteStore::RelatedResultSpec->mk_accessors( qw( maxNotes maxNotebooks maxTags writableNotebooksOnly includeContainingNotebooks includeDebugInfo ) );
+EDAMNoteStore::RelatedResultSpec->mk_accessors( qw( maxNotes maxNotebooks maxTags writableNotebooksOnly includeContainingNotebooks ) );
 
 sub new {
   my $classname = shift;
@@ -2707,7 +2722,6 @@ sub new {
   $self->{maxTags} = undef;
   $self->{writableNotebooksOnly} = undef;
   $self->{includeContainingNotebooks} = undef;
-  $self->{includeDebugInfo} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{maxNotes}) {
       $self->{maxNotes} = $vals->{maxNotes};
@@ -2723,9 +2737,6 @@ sub new {
     }
     if (defined $vals->{includeContainingNotebooks}) {
       $self->{includeContainingNotebooks} = $vals->{includeContainingNotebooks};
-    }
-    if (defined $vals->{includeDebugInfo}) {
-      $self->{includeDebugInfo} = $vals->{includeDebugInfo};
     }
   }
   return bless ($self, $classname);
@@ -2780,12 +2791,6 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
-      /^6$/ && do{      if ($ftype == TType::BOOL) {
-        $xfer += $input->readBool(\$self->{includeDebugInfo});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -2821,11 +2826,6 @@ sub write {
   if (defined $self->{includeContainingNotebooks}) {
     $xfer += $output->writeFieldBegin('includeContainingNotebooks', TType::BOOL, 5);
     $xfer += $output->writeBool($self->{includeContainingNotebooks});
-    $xfer += $output->writeFieldEnd();
-  }
-  if (defined $self->{includeDebugInfo}) {
-    $xfer += $output->writeFieldBegin('includeDebugInfo', TType::BOOL, 6);
-    $xfer += $output->writeBool($self->{includeDebugInfo});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();

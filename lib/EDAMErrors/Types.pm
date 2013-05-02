@@ -26,6 +26,8 @@ use constant LEN_TOO_LONG => 14;
 use constant TOO_FEW => 15;
 use constant TOO_MANY => 16;
 use constant UNSUPPORTED_OPERATION => 17;
+use constant TAKEN_DOWN => 18;
+use constant RATE_LIMIT_REACHED => 19;
 package EDAMErrors::EDAMUserException;
 use base qw(Thrift::TException);
 use base qw(Class::Accessor);
@@ -109,7 +111,7 @@ sub write {
 package EDAMErrors::EDAMSystemException;
 use base qw(Thrift::TException);
 use base qw(Class::Accessor);
-EDAMErrors::EDAMSystemException->mk_accessors( qw( errorCode message ) );
+EDAMErrors::EDAMSystemException->mk_accessors( qw( errorCode message rateLimitDuration ) );
 
 sub new {
   my $classname = shift;
@@ -117,12 +119,16 @@ sub new {
   my $vals      = shift || {};
   $self->{errorCode} = undef;
   $self->{message} = undef;
+  $self->{rateLimitDuration} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{errorCode}) {
       $self->{errorCode} = $vals->{errorCode};
     }
     if (defined $vals->{message}) {
       $self->{message} = $vals->{message};
+    }
+    if (defined $vals->{rateLimitDuration}) {
+      $self->{rateLimitDuration} = $vals->{rateLimitDuration};
     }
   }
   return bless ($self, $classname);
@@ -159,6 +165,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^3$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{rateLimitDuration});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -179,6 +191,11 @@ sub write {
   if (defined $self->{message}) {
     $xfer += $output->writeFieldBegin('message', TType::STRING, 2);
     $xfer += $output->writeString($self->{message});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{rateLimitDuration}) {
+    $xfer += $output->writeFieldBegin('rateLimitDuration', TType::I32, 3);
+    $xfer += $output->writeI32($self->{rateLimitDuration});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();

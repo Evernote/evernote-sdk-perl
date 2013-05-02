@@ -11,6 +11,7 @@ use Thrift;
 package EDAMTypes::PrivilegeLevel;
 use constant NORMAL => 1;
 use constant PREMIUM => 3;
+use constant VIP => 5;
 use constant MANAGER => 7;
 use constant SUPPORT => 8;
 use constant ADMIN => 9;
@@ -47,6 +48,9 @@ use constant NORMAL => 2;
 package EDAMTypes::SharedNotebookInstanceRestrictions;
 use constant ONLY_JOINED_OR_PREVIEW => 1;
 use constant NO_SHARED_NOTEBOOKS => 2;
+package EDAMTypes::ReminderEmailConfig;
+use constant DO_NOT_SEND => 1;
+use constant SEND_DAILY_EMAIL => 2;
 package EDAMTypes::Data;
 use base qw(Class::Accessor);
 EDAMTypes::Data->mk_accessors( qw( bodyHash size body ) );
@@ -143,7 +147,7 @@ sub write {
 
 package EDAMTypes::UserAttributes;
 use base qw(Class::Accessor);
-EDAMTypes::UserAttributes->mk_accessors( qw( defaultLocationName defaultLatitude defaultLongitude preactivation viewedPromotions incomingEmailAddress recentMailedAddresses comments dateAgreedToTermsOfService maxReferrals referralCount refererCode sentEmailDate sentEmailCount dailyEmailLimit emailOptOutDate partnerEmailOptInDate preferredLanguage preferredCountry clipFullPage twitterUserName twitterId groupName recognitionLanguage customerProfileId referralProof educationalDiscount businessAddress hideSponsorBilling taxExempt ) );
+EDAMTypes::UserAttributes->mk_accessors( qw( defaultLocationName defaultLatitude defaultLongitude preactivation viewedPromotions incomingEmailAddress recentMailedAddresses comments dateAgreedToTermsOfService maxReferrals referralCount refererCode sentEmailDate sentEmailCount dailyEmailLimit emailOptOutDate partnerEmailOptInDate preferredLanguage preferredCountry clipFullPage twitterUserName twitterId groupName recognitionLanguage referralProof educationalDiscount businessAddress hideSponsorBilling taxExempt useEmailAutoFiling reminderEmailConfig ) );
 
 sub new {
   my $classname = shift;
@@ -173,12 +177,13 @@ sub new {
   $self->{twitterId} = undef;
   $self->{groupName} = undef;
   $self->{recognitionLanguage} = undef;
-  $self->{customerProfileId} = undef;
   $self->{referralProof} = undef;
   $self->{educationalDiscount} = undef;
   $self->{businessAddress} = undef;
   $self->{hideSponsorBilling} = undef;
   $self->{taxExempt} = undef;
+  $self->{useEmailAutoFiling} = undef;
+  $self->{reminderEmailConfig} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{defaultLocationName}) {
       $self->{defaultLocationName} = $vals->{defaultLocationName};
@@ -252,9 +257,6 @@ sub new {
     if (defined $vals->{recognitionLanguage}) {
       $self->{recognitionLanguage} = $vals->{recognitionLanguage};
     }
-    if (defined $vals->{customerProfileId}) {
-      $self->{customerProfileId} = $vals->{customerProfileId};
-    }
     if (defined $vals->{referralProof}) {
       $self->{referralProof} = $vals->{referralProof};
     }
@@ -269,6 +271,12 @@ sub new {
     }
     if (defined $vals->{taxExempt}) {
       $self->{taxExempt} = $vals->{taxExempt};
+    }
+    if (defined $vals->{useEmailAutoFiling}) {
+      $self->{useEmailAutoFiling} = $vals->{useEmailAutoFiling};
+    }
+    if (defined $vals->{reminderEmailConfig}) {
+      $self->{reminderEmailConfig} = $vals->{reminderEmailConfig};
     }
   }
   return bless ($self, $classname);
@@ -461,12 +469,6 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
-      /^27$/ && do{      if ($ftype == TType::I64) {
-        $xfer += $input->readI64(\$self->{customerProfileId});
-      } else {
-        $xfer += $input->skip($ftype);
-      }
-      last; };
       /^28$/ && do{      if ($ftype == TType::STRING) {
         $xfer += $input->readString(\$self->{referralProof});
       } else {
@@ -493,6 +495,18 @@ sub read {
       last; };
       /^32$/ && do{      if ($ftype == TType::BOOL) {
         $xfer += $input->readBool(\$self->{taxExempt});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^33$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{useEmailAutoFiling});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^34$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{reminderEmailConfig});
       } else {
         $xfer += $input->skip($ftype);
       }
@@ -647,11 +661,6 @@ sub write {
     $xfer += $output->writeString($self->{recognitionLanguage});
     $xfer += $output->writeFieldEnd();
   }
-  if (defined $self->{customerProfileId}) {
-    $xfer += $output->writeFieldBegin('customerProfileId', TType::I64, 27);
-    $xfer += $output->writeI64($self->{customerProfileId});
-    $xfer += $output->writeFieldEnd();
-  }
   if (defined $self->{referralProof}) {
     $xfer += $output->writeFieldBegin('referralProof', TType::STRING, 28);
     $xfer += $output->writeString($self->{referralProof});
@@ -677,6 +686,16 @@ sub write {
     $xfer += $output->writeBool($self->{taxExempt});
     $xfer += $output->writeFieldEnd();
   }
+  if (defined $self->{useEmailAutoFiling}) {
+    $xfer += $output->writeFieldBegin('useEmailAutoFiling', TType::BOOL, 33);
+    $xfer += $output->writeBool($self->{useEmailAutoFiling});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{reminderEmailConfig}) {
+    $xfer += $output->writeFieldBegin('reminderEmailConfig', TType::I32, 34);
+    $xfer += $output->writeI32($self->{reminderEmailConfig});
+    $xfer += $output->writeFieldEnd();
+  }
   $xfer += $output->writeFieldStop();
   $xfer += $output->writeStructEnd();
   return $xfer;
@@ -684,7 +703,7 @@ sub write {
 
 package EDAMTypes::Accounting;
 use base qw(Class::Accessor);
-EDAMTypes::Accounting->mk_accessors( qw( uploadLimit uploadLimitEnd uploadLimitNextMonth premiumServiceStatus premiumOrderNumber premiumCommerceService premiumServiceStart premiumServiceSKU lastSuccessfulCharge lastFailedCharge lastFailedChargeReason nextPaymentDue premiumLockUntil updated premiumSubscriptionNumber lastRequestedCharge currency unitPrice businessId businessName businessRole ) );
+EDAMTypes::Accounting->mk_accessors( qw( uploadLimit uploadLimitEnd uploadLimitNextMonth premiumServiceStatus premiumOrderNumber premiumCommerceService premiumServiceStart premiumServiceSKU lastSuccessfulCharge lastFailedCharge lastFailedChargeReason nextPaymentDue premiumLockUntil updated premiumSubscriptionNumber lastRequestedCharge currency unitPrice businessId businessName businessRole unitDiscount nextChargeDate ) );
 
 sub new {
   my $classname = shift;
@@ -711,6 +730,8 @@ sub new {
   $self->{businessId} = undef;
   $self->{businessName} = undef;
   $self->{businessRole} = undef;
+  $self->{unitDiscount} = undef;
+  $self->{nextChargeDate} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{uploadLimit}) {
       $self->{uploadLimit} = $vals->{uploadLimit};
@@ -774,6 +795,12 @@ sub new {
     }
     if (defined $vals->{businessRole}) {
       $self->{businessRole} = $vals->{businessRole};
+    }
+    if (defined $vals->{unitDiscount}) {
+      $self->{unitDiscount} = $vals->{unitDiscount};
+    }
+    if (defined $vals->{nextChargeDate}) {
+      $self->{nextChargeDate} = $vals->{nextChargeDate};
     }
   }
   return bless ($self, $classname);
@@ -924,6 +951,18 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^23$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{unitDiscount});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^24$/ && do{      if ($ftype == TType::I64) {
+        $xfer += $input->readI64(\$self->{nextChargeDate});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -1041,6 +1080,125 @@ sub write {
     $xfer += $output->writeI32($self->{businessRole});
     $xfer += $output->writeFieldEnd();
   }
+  if (defined $self->{unitDiscount}) {
+    $xfer += $output->writeFieldBegin('unitDiscount', TType::I32, 23);
+    $xfer += $output->writeI32($self->{unitDiscount});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{nextChargeDate}) {
+    $xfer += $output->writeFieldBegin('nextChargeDate', TType::I64, 24);
+    $xfer += $output->writeI64($self->{nextChargeDate});
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMTypes::BusinessUserInfo;
+use base qw(Class::Accessor);
+EDAMTypes::BusinessUserInfo->mk_accessors( qw( businessId businessName role email ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{businessId} = undef;
+  $self->{businessName} = undef;
+  $self->{role} = undef;
+  $self->{email} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{businessId}) {
+      $self->{businessId} = $vals->{businessId};
+    }
+    if (defined $vals->{businessName}) {
+      $self->{businessName} = $vals->{businessName};
+    }
+    if (defined $vals->{role}) {
+      $self->{role} = $vals->{role};
+    }
+    if (defined $vals->{email}) {
+      $self->{email} = $vals->{email};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'BusinessUserInfo';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{businessId});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{businessName});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{role});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^4$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{email});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('BusinessUserInfo');
+  if (defined $self->{businessId}) {
+    $xfer += $output->writeFieldBegin('businessId', TType::I32, 1);
+    $xfer += $output->writeI32($self->{businessId});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{businessName}) {
+    $xfer += $output->writeFieldBegin('businessName', TType::STRING, 2);
+    $xfer += $output->writeString($self->{businessName});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{role}) {
+    $xfer += $output->writeFieldBegin('role', TType::I32, 3);
+    $xfer += $output->writeI32($self->{role});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{email}) {
+    $xfer += $output->writeFieldBegin('email', TType::STRING, 4);
+    $xfer += $output->writeString($self->{email});
+    $xfer += $output->writeFieldEnd();
+  }
   $xfer += $output->writeFieldStop();
   $xfer += $output->writeStructEnd();
   return $xfer;
@@ -1048,7 +1206,7 @@ sub write {
 
 package EDAMTypes::PremiumInfo;
 use base qw(Class::Accessor);
-EDAMTypes::PremiumInfo->mk_accessors( qw( currentTime premium premiumRecurring premiumExpirationDate premiumExtendable premiumPending premiumCancellationPending canPurchaseUploadAllowance sponsoredGroupName sponsoredGroupRole ) );
+EDAMTypes::PremiumInfo->mk_accessors( qw( currentTime premium premiumRecurring premiumExpirationDate premiumExtendable premiumPending premiumCancellationPending canPurchaseUploadAllowance sponsoredGroupName sponsoredGroupRole premiumUpgradable ) );
 
 sub new {
   my $classname = shift;
@@ -1064,6 +1222,7 @@ sub new {
   $self->{canPurchaseUploadAllowance} = undef;
   $self->{sponsoredGroupName} = undef;
   $self->{sponsoredGroupRole} = undef;
+  $self->{premiumUpgradable} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{currentTime}) {
       $self->{currentTime} = $vals->{currentTime};
@@ -1094,6 +1253,9 @@ sub new {
     }
     if (defined $vals->{sponsoredGroupRole}) {
       $self->{sponsoredGroupRole} = $vals->{sponsoredGroupRole};
+    }
+    if (defined $vals->{premiumUpgradable}) {
+      $self->{premiumUpgradable} = $vals->{premiumUpgradable};
     }
   }
   return bless ($self, $classname);
@@ -1178,6 +1340,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^11$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{premiumUpgradable});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -1240,6 +1408,11 @@ sub write {
     $xfer += $output->writeI32($self->{sponsoredGroupRole});
     $xfer += $output->writeFieldEnd();
   }
+  if (defined $self->{premiumUpgradable}) {
+    $xfer += $output->writeFieldBegin('premiumUpgradable', TType::BOOL, 11);
+    $xfer += $output->writeBool($self->{premiumUpgradable});
+    $xfer += $output->writeFieldEnd();
+  }
   $xfer += $output->writeFieldStop();
   $xfer += $output->writeStructEnd();
   return $xfer;
@@ -1247,7 +1420,7 @@ sub write {
 
 package EDAMTypes::User;
 use base qw(Class::Accessor);
-EDAMTypes::User->mk_accessors( qw( id username email name timezone privilege created updated deleted active shardId attributes accounting premiumInfo ) );
+EDAMTypes::User->mk_accessors( qw( id username email name timezone privilege created updated deleted active shardId attributes accounting premiumInfo businessUserInfo ) );
 
 sub new {
   my $classname = shift;
@@ -1267,6 +1440,7 @@ sub new {
   $self->{attributes} = undef;
   $self->{accounting} = undef;
   $self->{premiumInfo} = undef;
+  $self->{businessUserInfo} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{id}) {
       $self->{id} = $vals->{id};
@@ -1309,6 +1483,9 @@ sub new {
     }
     if (defined $vals->{premiumInfo}) {
       $self->{premiumInfo} = $vals->{premiumInfo};
+    }
+    if (defined $vals->{businessUserInfo}) {
+      $self->{businessUserInfo} = $vals->{businessUserInfo};
     }
   }
   return bless ($self, $classname);
@@ -1420,6 +1597,13 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^18$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{businessUserInfo} = new EDAMTypes::BusinessUserInfo();
+        $xfer += $self->{businessUserInfo}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -1500,6 +1684,11 @@ sub write {
   if (defined $self->{premiumInfo}) {
     $xfer += $output->writeFieldBegin('premiumInfo', TType::STRUCT, 17);
     $xfer += $self->{premiumInfo}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{businessUserInfo}) {
+    $xfer += $output->writeFieldBegin('businessUserInfo', TType::STRUCT, 18);
+    $xfer += $self->{businessUserInfo}->write($output);
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -2206,7 +2395,7 @@ sub write {
 
 package EDAMTypes::NoteAttributes;
 use base qw(Class::Accessor);
-EDAMTypes::NoteAttributes->mk_accessors( qw( subjectDate latitude longitude altitude author source sourceURL sourceApplication shareDate placeName contentClass applicationData lastEditedBy classifications ) );
+EDAMTypes::NoteAttributes->mk_accessors( qw( subjectDate latitude longitude altitude author source sourceURL sourceApplication shareDate reminderOrder reminderDoneTime reminderTime placeName contentClass applicationData lastEditedBy classifications ) );
 
 sub new {
   my $classname = shift;
@@ -2221,6 +2410,9 @@ sub new {
   $self->{sourceURL} = undef;
   $self->{sourceApplication} = undef;
   $self->{shareDate} = undef;
+  $self->{reminderOrder} = undef;
+  $self->{reminderDoneTime} = undef;
+  $self->{reminderTime} = undef;
   $self->{placeName} = undef;
   $self->{contentClass} = undef;
   $self->{applicationData} = undef;
@@ -2253,6 +2445,15 @@ sub new {
     }
     if (defined $vals->{shareDate}) {
       $self->{shareDate} = $vals->{shareDate};
+    }
+    if (defined $vals->{reminderOrder}) {
+      $self->{reminderOrder} = $vals->{reminderOrder};
+    }
+    if (defined $vals->{reminderDoneTime}) {
+      $self->{reminderDoneTime} = $vals->{reminderDoneTime};
+    }
+    if (defined $vals->{reminderTime}) {
+      $self->{reminderTime} = $vals->{reminderTime};
     }
     if (defined $vals->{placeName}) {
       $self->{placeName} = $vals->{placeName};
@@ -2342,6 +2543,24 @@ sub read {
       last; };
       /^17$/ && do{      if ($ftype == TType::I64) {
         $xfer += $input->readI64(\$self->{shareDate});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^18$/ && do{      if ($ftype == TType::I64) {
+        $xfer += $input->readI64(\$self->{reminderOrder});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^19$/ && do{      if ($ftype == TType::I64) {
+        $xfer += $input->readI64(\$self->{reminderDoneTime});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^20$/ && do{      if ($ftype == TType::I64) {
+        $xfer += $input->readI64(\$self->{reminderTime});
       } else {
         $xfer += $input->skip($ftype);
       }
@@ -2447,6 +2666,21 @@ sub write {
   if (defined $self->{shareDate}) {
     $xfer += $output->writeFieldBegin('shareDate', TType::I64, 17);
     $xfer += $output->writeI64($self->{shareDate});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{reminderOrder}) {
+    $xfer += $output->writeFieldBegin('reminderOrder', TType::I64, 18);
+    $xfer += $output->writeI64($self->{reminderOrder});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{reminderDoneTime}) {
+    $xfer += $output->writeFieldBegin('reminderDoneTime', TType::I64, 19);
+    $xfer += $output->writeI64($self->{reminderDoneTime});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{reminderTime}) {
+    $xfer += $output->writeFieldBegin('reminderTime', TType::I64, 20);
+    $xfer += $output->writeI64($self->{reminderTime});
     $xfer += $output->writeFieldEnd();
   }
   if (defined $self->{placeName}) {
@@ -3031,9 +3265,103 @@ sub write {
   return $xfer;
 }
 
+package EDAMTypes::SavedSearchScope;
+use base qw(Class::Accessor);
+EDAMTypes::SavedSearchScope->mk_accessors( qw( includeAccount includePersonalLinkedNotebooks includeBusinessLinkedNotebooks ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{includeAccount} = undef;
+  $self->{includePersonalLinkedNotebooks} = undef;
+  $self->{includeBusinessLinkedNotebooks} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{includeAccount}) {
+      $self->{includeAccount} = $vals->{includeAccount};
+    }
+    if (defined $vals->{includePersonalLinkedNotebooks}) {
+      $self->{includePersonalLinkedNotebooks} = $vals->{includePersonalLinkedNotebooks};
+    }
+    if (defined $vals->{includeBusinessLinkedNotebooks}) {
+      $self->{includeBusinessLinkedNotebooks} = $vals->{includeBusinessLinkedNotebooks};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'SavedSearchScope';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{includeAccount});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{includePersonalLinkedNotebooks});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{includeBusinessLinkedNotebooks});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('SavedSearchScope');
+  if (defined $self->{includeAccount}) {
+    $xfer += $output->writeFieldBegin('includeAccount', TType::BOOL, 1);
+    $xfer += $output->writeBool($self->{includeAccount});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{includePersonalLinkedNotebooks}) {
+    $xfer += $output->writeFieldBegin('includePersonalLinkedNotebooks', TType::BOOL, 2);
+    $xfer += $output->writeBool($self->{includePersonalLinkedNotebooks});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{includeBusinessLinkedNotebooks}) {
+    $xfer += $output->writeFieldBegin('includeBusinessLinkedNotebooks', TType::BOOL, 3);
+    $xfer += $output->writeBool($self->{includeBusinessLinkedNotebooks});
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
 package EDAMTypes::SavedSearch;
 use base qw(Class::Accessor);
-EDAMTypes::SavedSearch->mk_accessors( qw( guid name query format updateSequenceNum ) );
+EDAMTypes::SavedSearch->mk_accessors( qw( guid name query format updateSequenceNum scope ) );
 
 sub new {
   my $classname = shift;
@@ -3044,6 +3372,7 @@ sub new {
   $self->{query} = undef;
   $self->{format} = undef;
   $self->{updateSequenceNum} = undef;
+  $self->{scope} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{guid}) {
       $self->{guid} = $vals->{guid};
@@ -3059,6 +3388,9 @@ sub new {
     }
     if (defined $vals->{updateSequenceNum}) {
       $self->{updateSequenceNum} = $vals->{updateSequenceNum};
+    }
+    if (defined $vals->{scope}) {
+      $self->{scope} = $vals->{scope};
     }
   }
   return bless ($self, $classname);
@@ -3113,6 +3445,13 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^6$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{scope} = new EDAMTypes::SavedSearchScope();
+        $xfer += $self->{scope}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -3148,6 +3487,11 @@ sub write {
   if (defined $self->{updateSequenceNum}) {
     $xfer += $output->writeFieldBegin('updateSequenceNum', TType::I32, 5);
     $xfer += $output->writeI32($self->{updateSequenceNum});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{scope}) {
+    $xfer += $output->writeFieldBegin('scope', TType::STRUCT, 6);
+    $xfer += $self->{scope}->write($output);
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();

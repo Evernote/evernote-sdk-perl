@@ -22,7 +22,7 @@ sub new {
   my $vals      = shift || {};
   $self->{clientName} = undef;
   $self->{edamVersionMajor} = 1;
-  $self->{edamVersionMinor} = 23;
+  $self->{edamVersionMinor} = 24;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{clientName}) {
       $self->{clientName} = $vals->{clientName};
@@ -726,6 +726,151 @@ sub write {
     $xfer += $self->{success}->write($output);
     $xfer += $output->writeFieldEnd();
   }
+  if (defined $self->{userException}) {
+    $xfer += $output->writeFieldBegin('userException', TType::STRUCT, 1);
+    $xfer += $self->{userException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{systemException}) {
+    $xfer += $output->writeFieldBegin('systemException', TType::STRUCT, 2);
+    $xfer += $self->{systemException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMUserStore::UserStore_revokeLongSession_args;
+use base qw(Class::Accessor);
+EDAMUserStore::UserStore_revokeLongSession_args->mk_accessors( qw( authenticationToken ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{authenticationToken} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{authenticationToken}) {
+      $self->{authenticationToken} = $vals->{authenticationToken};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'UserStore_revokeLongSession_args';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{authenticationToken});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('UserStore_revokeLongSession_args');
+  if (defined $self->{authenticationToken}) {
+    $xfer += $output->writeFieldBegin('authenticationToken', TType::STRING, 1);
+    $xfer += $output->writeString($self->{authenticationToken});
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMUserStore::UserStore_revokeLongSession_result;
+use base qw(Class::Accessor);
+EDAMUserStore::UserStore_revokeLongSession_result->mk_accessors( qw( ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{userException} = undef;
+  $self->{systemException} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{userException}) {
+      $self->{userException} = $vals->{userException};
+    }
+    if (defined $vals->{systemException}) {
+      $self->{systemException} = $vals->{systemException};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'UserStore_revokeLongSession_result';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{userException} = new EDAMErrors::EDAMUserException();
+        $xfer += $self->{userException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{systemException} = new EDAMErrors::EDAMSystemException();
+        $xfer += $self->{systemException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('UserStore_revokeLongSession_result');
   if (defined $self->{userException}) {
     $xfer += $output->writeFieldBegin('userException', TType::STRUCT, 1);
     $xfer += $self->{userException}->write($output);
@@ -1765,6 +1910,13 @@ sub authenticateLongSession{
   die 'implement interface';
 }
 
+sub revokeLongSession{
+  my $self = shift;
+  my $authenticationToken = shift;
+
+  die 'implement interface';
+}
+
 sub authenticateToBusiness{
   my $self = shift;
   my $authenticationToken = shift;
@@ -1855,6 +2007,13 @@ sub authenticateLongSession{
   my $deviceIdentifier = ($request->{'deviceIdentifier'}) ? $request->{'deviceIdentifier'} : undef;
   my $deviceDescription = ($request->{'deviceDescription'}) ? $request->{'deviceDescription'} : undef;
   return $self->{impl}->authenticateLongSession($username, $password, $consumerKey, $consumerSecret, $deviceIdentifier, $deviceDescription);
+}
+
+sub revokeLongSession{
+  my ($self, $request) = @_;
+
+  my $authenticationToken = ($request->{'authenticationToken'}) ? $request->{'authenticationToken'} : undef;
+  return $self->{impl}->revokeLongSession($authenticationToken);
 }
 
 sub authenticateToBusiness{
@@ -2125,6 +2284,52 @@ sub recv_authenticateLongSession{
     die $result->{systemException};
   }
   die "authenticateLongSession failed: unknown result";
+}
+sub revokeLongSession{
+  my $self = shift;
+  my $authenticationToken = shift;
+
+    $self->send_revokeLongSession($authenticationToken);
+  $self->recv_revokeLongSession();
+}
+
+sub send_revokeLongSession{
+  my $self = shift;
+  my $authenticationToken = shift;
+
+  $self->{output}->writeMessageBegin('revokeLongSession', TMessageType::CALL, $self->{seqid});
+  my $args = new EDAMUserStore::UserStore_revokeLongSession_args();
+  $args->{authenticationToken} = $authenticationToken;
+  $args->write($self->{output});
+  $self->{output}->writeMessageEnd();
+  $self->{output}->getTransport()->flush();
+}
+
+sub recv_revokeLongSession{
+  my $self = shift;
+
+  my $rseqid = 0;
+  my $fname;
+  my $mtype = 0;
+
+  $self->{input}->readMessageBegin(\$fname, \$mtype, \$rseqid);
+  if ($mtype == TMessageType::EXCEPTION) {
+    my $x = new TApplicationException();
+    $x->read($self->{input});
+    $self->{input}->readMessageEnd();
+    die $x;
+  }
+  my $result = new EDAMUserStore::UserStore_revokeLongSession_result();
+  $result->read($self->{input});
+  $self->{input}->readMessageEnd();
+
+  if (defined $result->{userException}) {
+    die $result->{userException};
+  }
+  if (defined $result->{systemException}) {
+    die $result->{systemException};
+  }
+  return;
 }
 sub authenticateToBusiness{
   my $self = shift;
@@ -2516,6 +2721,25 @@ sub process_authenticateLongSession {
       $result->{systemException} = $@;
     }
     $output->writeMessageBegin('authenticateLongSession', TMessageType::REPLY, $seqid);
+    $result->write($output);
+    $output->writeMessageEnd();
+    $output->getTransport()->flush();
+}
+
+sub process_revokeLongSession {
+    my ($self, $seqid, $input, $output) = @_;
+    my $args = new EDAMUserStore::UserStore_revokeLongSession_args();
+    $args->read($input);
+    $input->readMessageEnd();
+    my $result = new EDAMUserStore::UserStore_revokeLongSession_result();
+    eval {
+      $self->{handler}->revokeLongSession($args->authenticationToken);
+    }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
+      $result->{userException} = $@;
+        }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMSystemException') ){ 
+      $result->{systemException} = $@;
+    }
+    $output->writeMessageBegin('revokeLongSession', TMessageType::REPLY, $seqid);
     $result->write($output);
     $output->writeMessageEnd();
     $output->getTransport()->flush();
