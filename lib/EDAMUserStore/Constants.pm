@@ -12,6 +12,6 @@ use Thrift;
 
 use constant EDAM_VERSION_MAJOR => 1;
 
-use constant EDAM_VERSION_MINOR => 24;
+use constant EDAM_VERSION_MINOR => 25;
 
 1;

@@ -1,7 +1,7 @@
 Evernote SDK for Perl
 ==========================================
 
-Evernote API version 1.22
+Evernote API version 1.25
 
 Overview
 --------

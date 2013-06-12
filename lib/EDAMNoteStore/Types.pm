@@ -2419,7 +2419,7 @@ sub write {
 
 package EDAMNoteStore::RelatedQuery;
 use base qw(Class::Accessor);
-EDAMNoteStore::RelatedQuery->mk_accessors( qw( noteGuid plainText filter ) );
+EDAMNoteStore::RelatedQuery->mk_accessors( qw( noteGuid plainText filter referenceUri ) );
 
 sub new {
   my $classname = shift;
@@ -2428,6 +2428,7 @@ sub new {
   $self->{noteGuid} = undef;
   $self->{plainText} = undef;
   $self->{filter} = undef;
+  $self->{referenceUri} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{noteGuid}) {
       $self->{noteGuid} = $vals->{noteGuid};
@@ -2437,6 +2438,9 @@ sub new {
     }
     if (defined $vals->{filter}) {
       $self->{filter} = $vals->{filter};
+    }
+    if (defined $vals->{referenceUri}) {
+      $self->{referenceUri} = $vals->{referenceUri};
     }
   }
   return bless ($self, $classname);
@@ -2480,6 +2484,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^4$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{referenceUri});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -2505,6 +2515,11 @@ sub write {
   if (defined $self->{filter}) {
     $xfer += $output->writeFieldBegin('filter', TType::STRUCT, 3);
     $xfer += $self->{filter}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{referenceUri}) {
+    $xfer += $output->writeFieldBegin('referenceUri', TType::STRING, 4);
+    $xfer += $output->writeString($self->{referenceUri});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
