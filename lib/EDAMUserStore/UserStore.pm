@@ -22,7 +22,7 @@ sub new {
   my $vals      = shift || {};
   $self->{clientName} = undef;
   $self->{edamVersionMajor} = 1;
-  $self->{edamVersionMinor} = 24;
+  $self->{edamVersionMinor} = 25;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{clientName}) {
       $self->{clientName} = $vals->{clientName};
@@ -301,7 +301,7 @@ sub write {
 
 package EDAMUserStore::UserStore_authenticate_args;
 use base qw(Class::Accessor);
-EDAMUserStore::UserStore_authenticate_args->mk_accessors( qw( username password consumerKey consumerSecret ) );
+EDAMUserStore::UserStore_authenticate_args->mk_accessors( qw( username password consumerKey consumerSecret supportsTwoFactor ) );
 
 sub new {
   my $classname = shift;
@@ -311,6 +311,7 @@ sub new {
   $self->{password} = undef;
   $self->{consumerKey} = undef;
   $self->{consumerSecret} = undef;
+  $self->{supportsTwoFactor} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{username}) {
       $self->{username} = $vals->{username};
@@ -323,6 +324,9 @@ sub new {
     }
     if (defined $vals->{consumerSecret}) {
       $self->{consumerSecret} = $vals->{consumerSecret};
+    }
+    if (defined $vals->{supportsTwoFactor}) {
+      $self->{supportsTwoFactor} = $vals->{supportsTwoFactor};
     }
   }
   return bless ($self, $classname);
@@ -371,6 +375,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^5$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{supportsTwoFactor});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -401,6 +411,11 @@ sub write {
   if (defined $self->{consumerSecret}) {
     $xfer += $output->writeFieldBegin('consumerSecret', TType::STRING, 4);
     $xfer += $output->writeString($self->{consumerSecret});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{supportsTwoFactor}) {
+    $xfer += $output->writeFieldBegin('supportsTwoFactor', TType::BOOL, 5);
+    $xfer += $output->writeBool($self->{supportsTwoFactor});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -507,7 +522,7 @@ sub write {
 
 package EDAMUserStore::UserStore_authenticateLongSession_args;
 use base qw(Class::Accessor);
-EDAMUserStore::UserStore_authenticateLongSession_args->mk_accessors( qw( username password consumerKey consumerSecret deviceIdentifier deviceDescription ) );
+EDAMUserStore::UserStore_authenticateLongSession_args->mk_accessors( qw( username password consumerKey consumerSecret deviceIdentifier deviceDescription supportsTwoFactor ) );
 
 sub new {
   my $classname = shift;
@@ -519,6 +534,7 @@ sub new {
   $self->{consumerSecret} = undef;
   $self->{deviceIdentifier} = undef;
   $self->{deviceDescription} = undef;
+  $self->{supportsTwoFactor} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{username}) {
       $self->{username} = $vals->{username};
@@ -537,6 +553,9 @@ sub new {
     }
     if (defined $vals->{deviceDescription}) {
       $self->{deviceDescription} = $vals->{deviceDescription};
+    }
+    if (defined $vals->{supportsTwoFactor}) {
+      $self->{supportsTwoFactor} = $vals->{supportsTwoFactor};
     }
   }
   return bless ($self, $classname);
@@ -597,6 +616,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^7$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{supportsTwoFactor});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -637,6 +662,11 @@ sub write {
   if (defined $self->{deviceDescription}) {
     $xfer += $output->writeFieldBegin('deviceDescription', TType::STRING, 6);
     $xfer += $output->writeString($self->{deviceDescription});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{supportsTwoFactor}) {
+    $xfer += $output->writeFieldBegin('supportsTwoFactor', TType::BOOL, 7);
+    $xfer += $output->writeBool($self->{supportsTwoFactor});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -721,6 +751,212 @@ sub write {
   my ($self, $output) = @_;
   my $xfer   = 0;
   $xfer += $output->writeStructBegin('UserStore_authenticateLongSession_result');
+  if (defined $self->{success}) {
+    $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
+    $xfer += $self->{success}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{userException}) {
+    $xfer += $output->writeFieldBegin('userException', TType::STRUCT, 1);
+    $xfer += $self->{userException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{systemException}) {
+    $xfer += $output->writeFieldBegin('systemException', TType::STRUCT, 2);
+    $xfer += $self->{systemException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMUserStore::UserStore_completeTwoFactorAuthentication_args;
+use base qw(Class::Accessor);
+EDAMUserStore::UserStore_completeTwoFactorAuthentication_args->mk_accessors( qw( authenticationToken oneTimeCode deviceIdentifier deviceDescription ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{authenticationToken} = undef;
+  $self->{oneTimeCode} = undef;
+  $self->{deviceIdentifier} = undef;
+  $self->{deviceDescription} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{authenticationToken}) {
+      $self->{authenticationToken} = $vals->{authenticationToken};
+    }
+    if (defined $vals->{oneTimeCode}) {
+      $self->{oneTimeCode} = $vals->{oneTimeCode};
+    }
+    if (defined $vals->{deviceIdentifier}) {
+      $self->{deviceIdentifier} = $vals->{deviceIdentifier};
+    }
+    if (defined $vals->{deviceDescription}) {
+      $self->{deviceDescription} = $vals->{deviceDescription};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'UserStore_completeTwoFactorAuthentication_args';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{authenticationToken});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{oneTimeCode});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{deviceIdentifier});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^4$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{deviceDescription});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('UserStore_completeTwoFactorAuthentication_args');
+  if (defined $self->{authenticationToken}) {
+    $xfer += $output->writeFieldBegin('authenticationToken', TType::STRING, 1);
+    $xfer += $output->writeString($self->{authenticationToken});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{oneTimeCode}) {
+    $xfer += $output->writeFieldBegin('oneTimeCode', TType::STRING, 2);
+    $xfer += $output->writeString($self->{oneTimeCode});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{deviceIdentifier}) {
+    $xfer += $output->writeFieldBegin('deviceIdentifier', TType::STRING, 3);
+    $xfer += $output->writeString($self->{deviceIdentifier});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{deviceDescription}) {
+    $xfer += $output->writeFieldBegin('deviceDescription', TType::STRING, 4);
+    $xfer += $output->writeString($self->{deviceDescription});
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMUserStore::UserStore_completeTwoFactorAuthentication_result;
+use base qw(Class::Accessor);
+EDAMUserStore::UserStore_completeTwoFactorAuthentication_result->mk_accessors( qw( success ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{success} = undef;
+  $self->{userException} = undef;
+  $self->{systemException} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{success}) {
+      $self->{success} = $vals->{success};
+    }
+    if (defined $vals->{userException}) {
+      $self->{userException} = $vals->{userException};
+    }
+    if (defined $vals->{systemException}) {
+      $self->{systemException} = $vals->{systemException};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'UserStore_completeTwoFactorAuthentication_result';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^0$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{success} = new EDAMUserStore::AuthenticationResult();
+        $xfer += $self->{success}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^1$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{userException} = new EDAMErrors::EDAMUserException();
+        $xfer += $self->{userException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{systemException} = new EDAMErrors::EDAMSystemException();
+        $xfer += $self->{systemException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('UserStore_completeTwoFactorAuthentication_result');
   if (defined $self->{success}) {
     $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
     $xfer += $self->{success}->write($output);
@@ -1894,6 +2130,7 @@ sub authenticate{
   my $password = shift;
   my $consumerKey = shift;
   my $consumerSecret = shift;
+  my $supportsTwoFactor = shift;
 
   die 'implement interface';
 }
@@ -1904,6 +2141,17 @@ sub authenticateLongSession{
   my $password = shift;
   my $consumerKey = shift;
   my $consumerSecret = shift;
+  my $deviceIdentifier = shift;
+  my $deviceDescription = shift;
+  my $supportsTwoFactor = shift;
+
+  die 'implement interface';
+}
+
+sub completeTwoFactorAuthentication{
+  my $self = shift;
+  my $authenticationToken = shift;
+  my $oneTimeCode = shift;
   my $deviceIdentifier = shift;
   my $deviceDescription = shift;
 
@@ -1994,7 +2242,8 @@ sub authenticate{
   my $password = ($request->{'password'}) ? $request->{'password'} : undef;
   my $consumerKey = ($request->{'consumerKey'}) ? $request->{'consumerKey'} : undef;
   my $consumerSecret = ($request->{'consumerSecret'}) ? $request->{'consumerSecret'} : undef;
-  return $self->{impl}->authenticate($username, $password, $consumerKey, $consumerSecret);
+  my $supportsTwoFactor = ($request->{'supportsTwoFactor'}) ? $request->{'supportsTwoFactor'} : undef;
+  return $self->{impl}->authenticate($username, $password, $consumerKey, $consumerSecret, $supportsTwoFactor);
 }
 
 sub authenticateLongSession{
@@ -2006,7 +2255,18 @@ sub authenticateLongSession{
   my $consumerSecret = ($request->{'consumerSecret'}) ? $request->{'consumerSecret'} : undef;
   my $deviceIdentifier = ($request->{'deviceIdentifier'}) ? $request->{'deviceIdentifier'} : undef;
   my $deviceDescription = ($request->{'deviceDescription'}) ? $request->{'deviceDescription'} : undef;
-  return $self->{impl}->authenticateLongSession($username, $password, $consumerKey, $consumerSecret, $deviceIdentifier, $deviceDescription);
+  my $supportsTwoFactor = ($request->{'supportsTwoFactor'}) ? $request->{'supportsTwoFactor'} : undef;
+  return $self->{impl}->authenticateLongSession($username, $password, $consumerKey, $consumerSecret, $deviceIdentifier, $deviceDescription, $supportsTwoFactor);
+}
+
+sub completeTwoFactorAuthentication{
+  my ($self, $request) = @_;
+
+  my $authenticationToken = ($request->{'authenticationToken'}) ? $request->{'authenticationToken'} : undef;
+  my $oneTimeCode = ($request->{'oneTimeCode'}) ? $request->{'oneTimeCode'} : undef;
+  my $deviceIdentifier = ($request->{'deviceIdentifier'}) ? $request->{'deviceIdentifier'} : undef;
+  my $deviceDescription = ($request->{'deviceDescription'}) ? $request->{'deviceDescription'} : undef;
+  return $self->{impl}->completeTwoFactorAuthentication($authenticationToken, $oneTimeCode, $deviceIdentifier, $deviceDescription);
 }
 
 sub revokeLongSession{
@@ -2169,8 +2429,9 @@ sub authenticate{
   my $password = shift;
   my $consumerKey = shift;
   my $consumerSecret = shift;
+  my $supportsTwoFactor = shift;
 
-    $self->send_authenticate($username, $password, $consumerKey, $consumerSecret);
+    $self->send_authenticate($username, $password, $consumerKey, $consumerSecret, $supportsTwoFactor);
   return $self->recv_authenticate();
 }
 
@@ -2180,6 +2441,7 @@ sub send_authenticate{
   my $password = shift;
   my $consumerKey = shift;
   my $consumerSecret = shift;
+  my $supportsTwoFactor = shift;
 
   $self->{output}->writeMessageBegin('authenticate', TMessageType::CALL, $self->{seqid});
   my $args = new EDAMUserStore::UserStore_authenticate_args();
@@ -2187,6 +2449,7 @@ sub send_authenticate{
   $args->{password} = $password;
   $args->{consumerKey} = $consumerKey;
   $args->{consumerSecret} = $consumerSecret;
+  $args->{supportsTwoFactor} = $supportsTwoFactor;
   $args->write($self->{output});
   $self->{output}->writeMessageEnd();
   $self->{output}->getTransport()->flush();
@@ -2229,8 +2492,9 @@ sub authenticateLongSession{
   my $consumerSecret = shift;
   my $deviceIdentifier = shift;
   my $deviceDescription = shift;
+  my $supportsTwoFactor = shift;
 
-    $self->send_authenticateLongSession($username, $password, $consumerKey, $consumerSecret, $deviceIdentifier, $deviceDescription);
+    $self->send_authenticateLongSession($username, $password, $consumerKey, $consumerSecret, $deviceIdentifier, $deviceDescription, $supportsTwoFactor);
   return $self->recv_authenticateLongSession();
 }
 
@@ -2242,6 +2506,7 @@ sub send_authenticateLongSession{
   my $consumerSecret = shift;
   my $deviceIdentifier = shift;
   my $deviceDescription = shift;
+  my $supportsTwoFactor = shift;
 
   $self->{output}->writeMessageBegin('authenticateLongSession', TMessageType::CALL, $self->{seqid});
   my $args = new EDAMUserStore::UserStore_authenticateLongSession_args();
@@ -2251,6 +2516,7 @@ sub send_authenticateLongSession{
   $args->{consumerSecret} = $consumerSecret;
   $args->{deviceIdentifier} = $deviceIdentifier;
   $args->{deviceDescription} = $deviceDescription;
+  $args->{supportsTwoFactor} = $supportsTwoFactor;
   $args->write($self->{output});
   $self->{output}->writeMessageEnd();
   $self->{output}->getTransport()->flush();
@@ -2284,6 +2550,64 @@ sub recv_authenticateLongSession{
     die $result->{systemException};
   }
   die "authenticateLongSession failed: unknown result";
+}
+sub completeTwoFactorAuthentication{
+  my $self = shift;
+  my $authenticationToken = shift;
+  my $oneTimeCode = shift;
+  my $deviceIdentifier = shift;
+  my $deviceDescription = shift;
+
+    $self->send_completeTwoFactorAuthentication($authenticationToken, $oneTimeCode, $deviceIdentifier, $deviceDescription);
+  return $self->recv_completeTwoFactorAuthentication();
+}
+
+sub send_completeTwoFactorAuthentication{
+  my $self = shift;
+  my $authenticationToken = shift;
+  my $oneTimeCode = shift;
+  my $deviceIdentifier = shift;
+  my $deviceDescription = shift;
+
+  $self->{output}->writeMessageBegin('completeTwoFactorAuthentication', TMessageType::CALL, $self->{seqid});
+  my $args = new EDAMUserStore::UserStore_completeTwoFactorAuthentication_args();
+  $args->{authenticationToken} = $authenticationToken;
+  $args->{oneTimeCode} = $oneTimeCode;
+  $args->{deviceIdentifier} = $deviceIdentifier;
+  $args->{deviceDescription} = $deviceDescription;
+  $args->write($self->{output});
+  $self->{output}->writeMessageEnd();
+  $self->{output}->getTransport()->flush();
+}
+
+sub recv_completeTwoFactorAuthentication{
+  my $self = shift;
+
+  my $rseqid = 0;
+  my $fname;
+  my $mtype = 0;
+
+  $self->{input}->readMessageBegin(\$fname, \$mtype, \$rseqid);
+  if ($mtype == TMessageType::EXCEPTION) {
+    my $x = new TApplicationException();
+    $x->read($self->{input});
+    $self->{input}->readMessageEnd();
+    die $x;
+  }
+  my $result = new EDAMUserStore::UserStore_completeTwoFactorAuthentication_result();
+  $result->read($self->{input});
+  $self->{input}->readMessageEnd();
+
+  if (defined $result->{success} ) {
+    return $result->{success};
+  }
+  if (defined $result->{userException}) {
+    die $result->{userException};
+  }
+  if (defined $result->{systemException}) {
+    die $result->{systemException};
+  }
+  die "completeTwoFactorAuthentication failed: unknown result";
 }
 sub revokeLongSession{
   my $self = shift;
@@ -2695,7 +3019,7 @@ sub process_authenticate {
     $input->readMessageEnd();
     my $result = new EDAMUserStore::UserStore_authenticate_result();
     eval {
-      $result->{success} = $self->{handler}->authenticate($args->username, $args->password, $args->consumerKey, $args->consumerSecret);
+      $result->{success} = $self->{handler}->authenticate($args->username, $args->password, $args->consumerKey, $args->consumerSecret, $args->supportsTwoFactor);
     }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
       $result->{userException} = $@;
         }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMSystemException') ){ 
@@ -2714,13 +3038,32 @@ sub process_authenticateLongSession {
     $input->readMessageEnd();
     my $result = new EDAMUserStore::UserStore_authenticateLongSession_result();
     eval {
-      $result->{success} = $self->{handler}->authenticateLongSession($args->username, $args->password, $args->consumerKey, $args->consumerSecret, $args->deviceIdentifier, $args->deviceDescription);
+      $result->{success} = $self->{handler}->authenticateLongSession($args->username, $args->password, $args->consumerKey, $args->consumerSecret, $args->deviceIdentifier, $args->deviceDescription, $args->supportsTwoFactor);
     }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
       $result->{userException} = $@;
         }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMSystemException') ){ 
       $result->{systemException} = $@;
     }
     $output->writeMessageBegin('authenticateLongSession', TMessageType::REPLY, $seqid);
+    $result->write($output);
+    $output->writeMessageEnd();
+    $output->getTransport()->flush();
+}
+
+sub process_completeTwoFactorAuthentication {
+    my ($self, $seqid, $input, $output) = @_;
+    my $args = new EDAMUserStore::UserStore_completeTwoFactorAuthentication_args();
+    $args->read($input);
+    $input->readMessageEnd();
+    my $result = new EDAMUserStore::UserStore_completeTwoFactorAuthentication_result();
+    eval {
+      $result->{success} = $self->{handler}->completeTwoFactorAuthentication($args->authenticationToken, $args->oneTimeCode, $args->deviceIdentifier, $args->deviceDescription);
+    }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
+      $result->{userException} = $@;
+        }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMSystemException') ){ 
+      $result->{systemException} = $@;
+    }
+    $output->writeMessageBegin('completeTwoFactorAuthentication', TMessageType::REPLY, $seqid);
     $result->write($output);
     $output->writeMessageEnd();
     $output->getTransport()->flush();

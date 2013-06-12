@@ -2395,7 +2395,7 @@ sub write {
 
 package EDAMTypes::NoteAttributes;
 use base qw(Class::Accessor);
-EDAMTypes::NoteAttributes->mk_accessors( qw( subjectDate latitude longitude altitude author source sourceURL sourceApplication shareDate reminderOrder reminderDoneTime reminderTime placeName contentClass applicationData lastEditedBy classifications ) );
+EDAMTypes::NoteAttributes->mk_accessors( qw( subjectDate latitude longitude altitude author source sourceURL sourceApplication shareDate reminderOrder reminderDoneTime reminderTime placeName contentClass applicationData lastEditedBy classifications creatorId lastEditorId ) );
 
 sub new {
   my $classname = shift;
@@ -2418,6 +2418,8 @@ sub new {
   $self->{applicationData} = undef;
   $self->{lastEditedBy} = undef;
   $self->{classifications} = undef;
+  $self->{creatorId} = undef;
+  $self->{lastEditorId} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{subjectDate}) {
       $self->{subjectDate} = $vals->{subjectDate};
@@ -2469,6 +2471,12 @@ sub new {
     }
     if (defined $vals->{classifications}) {
       $self->{classifications} = $vals->{classifications};
+    }
+    if (defined $vals->{creatorId}) {
+      $self->{creatorId} = $vals->{creatorId};
+    }
+    if (defined $vals->{lastEditorId}) {
+      $self->{lastEditorId} = $vals->{lastEditorId};
     }
   }
   return bless ($self, $classname);
@@ -2611,6 +2619,18 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^27$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{creatorId});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^28$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{lastEditorId});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -2716,6 +2736,16 @@ sub write {
       }
       $xfer += $output->writeMapEnd();
     }
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{creatorId}) {
+    $xfer += $output->writeFieldBegin('creatorId', TType::I32, 27);
+    $xfer += $output->writeI32($self->{creatorId});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{lastEditorId}) {
+    $xfer += $output->writeFieldBegin('lastEditorId', TType::I32, 28);
+    $xfer += $output->writeI32($self->{lastEditorId});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -3499,9 +3529,88 @@ sub write {
   return $xfer;
 }
 
+package EDAMTypes::SharedNotebookRecipientSettings;
+use base qw(Class::Accessor);
+EDAMTypes::SharedNotebookRecipientSettings->mk_accessors( qw( reminderNotifyEmail reminderNotifyInApp ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{reminderNotifyEmail} = undef;
+  $self->{reminderNotifyInApp} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{reminderNotifyEmail}) {
+      $self->{reminderNotifyEmail} = $vals->{reminderNotifyEmail};
+    }
+    if (defined $vals->{reminderNotifyInApp}) {
+      $self->{reminderNotifyInApp} = $vals->{reminderNotifyInApp};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'SharedNotebookRecipientSettings';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{reminderNotifyEmail});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{reminderNotifyInApp});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('SharedNotebookRecipientSettings');
+  if (defined $self->{reminderNotifyEmail}) {
+    $xfer += $output->writeFieldBegin('reminderNotifyEmail', TType::BOOL, 1);
+    $xfer += $output->writeBool($self->{reminderNotifyEmail});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{reminderNotifyInApp}) {
+    $xfer += $output->writeFieldBegin('reminderNotifyInApp', TType::BOOL, 2);
+    $xfer += $output->writeBool($self->{reminderNotifyInApp});
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
 package EDAMTypes::SharedNotebook;
 use base qw(Class::Accessor);
-EDAMTypes::SharedNotebook->mk_accessors( qw( id userId notebookGuid email notebookModifiable requireLogin serviceCreated serviceUpdated shareKey username privilege allowPreview ) );
+EDAMTypes::SharedNotebook->mk_accessors( qw( id userId notebookGuid email notebookModifiable requireLogin serviceCreated serviceUpdated shareKey username privilege allowPreview recipientSettings ) );
 
 sub new {
   my $classname = shift;
@@ -3519,6 +3628,7 @@ sub new {
   $self->{username} = undef;
   $self->{privilege} = undef;
   $self->{allowPreview} = undef;
+  $self->{recipientSettings} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{id}) {
       $self->{id} = $vals->{id};
@@ -3555,6 +3665,9 @@ sub new {
     }
     if (defined $vals->{allowPreview}) {
       $self->{allowPreview} = $vals->{allowPreview};
+    }
+    if (defined $vals->{recipientSettings}) {
+      $self->{recipientSettings} = $vals->{recipientSettings};
     }
   }
   return bless ($self, $classname);
@@ -3651,6 +3764,13 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^13$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{recipientSettings} = new EDAMTypes::SharedNotebookRecipientSettings();
+        $xfer += $self->{recipientSettings}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -3721,6 +3841,11 @@ sub write {
   if (defined $self->{allowPreview}) {
     $xfer += $output->writeFieldBegin('allowPreview', TType::BOOL, 12);
     $xfer += $output->writeBool($self->{allowPreview});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{recipientSettings}) {
+    $xfer += $output->writeFieldBegin('recipientSettings', TType::STRUCT, 13);
+    $xfer += $self->{recipientSettings}->write($output);
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();

@@ -149,7 +149,7 @@ sub write {
 
 package EDAMUserStore::AuthenticationResult;
 use base qw(Class::Accessor);
-EDAMUserStore::AuthenticationResult->mk_accessors( qw( currentTime authenticationToken expiration user publicUserInfo noteStoreUrl webApiUrlPrefix ) );
+EDAMUserStore::AuthenticationResult->mk_accessors( qw( currentTime authenticationToken expiration user publicUserInfo noteStoreUrl webApiUrlPrefix secondFactorRequired secondFactorDeliveryHint ) );
 
 sub new {
   my $classname = shift;
@@ -162,6 +162,8 @@ sub new {
   $self->{publicUserInfo} = undef;
   $self->{noteStoreUrl} = undef;
   $self->{webApiUrlPrefix} = undef;
+  $self->{secondFactorRequired} = undef;
+  $self->{secondFactorDeliveryHint} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{currentTime}) {
       $self->{currentTime} = $vals->{currentTime};
@@ -183,6 +185,12 @@ sub new {
     }
     if (defined $vals->{webApiUrlPrefix}) {
       $self->{webApiUrlPrefix} = $vals->{webApiUrlPrefix};
+    }
+    if (defined $vals->{secondFactorRequired}) {
+      $self->{secondFactorRequired} = $vals->{secondFactorRequired};
+    }
+    if (defined $vals->{secondFactorDeliveryHint}) {
+      $self->{secondFactorDeliveryHint} = $vals->{secondFactorDeliveryHint};
     }
   }
   return bless ($self, $classname);
@@ -251,6 +259,18 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^8$/ && do{      if ($ftype == TType::BOOL) {
+        $xfer += $input->readBool(\$self->{secondFactorRequired});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^9$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{secondFactorDeliveryHint});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -296,6 +316,16 @@ sub write {
   if (defined $self->{webApiUrlPrefix}) {
     $xfer += $output->writeFieldBegin('webApiUrlPrefix', TType::STRING, 7);
     $xfer += $output->writeString($self->{webApiUrlPrefix});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{secondFactorRequired}) {
+    $xfer += $output->writeFieldBegin('secondFactorRequired', TType::BOOL, 8);
+    $xfer += $output->writeBool($self->{secondFactorRequired});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{secondFactorDeliveryHint}) {
+    $xfer += $output->writeFieldBegin('secondFactorDeliveryHint', TType::STRING, 9);
+    $xfer += $output->writeString($self->{secondFactorDeliveryHint});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();

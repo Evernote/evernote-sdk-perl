@@ -11990,6 +11990,213 @@ sub write {
   return $xfer;
 }
 
+package EDAMNoteStore::NoteStore_setSharedNotebookRecipientSettings_args;
+use base qw(Class::Accessor);
+EDAMNoteStore::NoteStore_setSharedNotebookRecipientSettings_args->mk_accessors( qw( authenticationToken sharedNotebookId recipientSettings ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{authenticationToken} = undef;
+  $self->{sharedNotebookId} = undef;
+  $self->{recipientSettings} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{authenticationToken}) {
+      $self->{authenticationToken} = $vals->{authenticationToken};
+    }
+    if (defined $vals->{sharedNotebookId}) {
+      $self->{sharedNotebookId} = $vals->{sharedNotebookId};
+    }
+    if (defined $vals->{recipientSettings}) {
+      $self->{recipientSettings} = $vals->{recipientSettings};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'NoteStore_setSharedNotebookRecipientSettings_args';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^1$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{authenticationToken});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::I64) {
+        $xfer += $input->readI64(\$self->{sharedNotebookId});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{recipientSettings} = new EDAMTypes::SharedNotebookRecipientSettings();
+        $xfer += $self->{recipientSettings}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('NoteStore_setSharedNotebookRecipientSettings_args');
+  if (defined $self->{authenticationToken}) {
+    $xfer += $output->writeFieldBegin('authenticationToken', TType::STRING, 1);
+    $xfer += $output->writeString($self->{authenticationToken});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{sharedNotebookId}) {
+    $xfer += $output->writeFieldBegin('sharedNotebookId', TType::I64, 2);
+    $xfer += $output->writeI64($self->{sharedNotebookId});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{recipientSettings}) {
+    $xfer += $output->writeFieldBegin('recipientSettings', TType::STRUCT, 3);
+    $xfer += $self->{recipientSettings}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
+package EDAMNoteStore::NoteStore_setSharedNotebookRecipientSettings_result;
+use base qw(Class::Accessor);
+EDAMNoteStore::NoteStore_setSharedNotebookRecipientSettings_result->mk_accessors( qw( success ) );
+
+sub new {
+  my $classname = shift;
+  my $self      = {};
+  my $vals      = shift || {};
+  $self->{success} = undef;
+  $self->{userException} = undef;
+  $self->{notFoundException} = undef;
+  $self->{systemException} = undef;
+  if (UNIVERSAL::isa($vals,'HASH')) {
+    if (defined $vals->{success}) {
+      $self->{success} = $vals->{success};
+    }
+    if (defined $vals->{userException}) {
+      $self->{userException} = $vals->{userException};
+    }
+    if (defined $vals->{notFoundException}) {
+      $self->{notFoundException} = $vals->{notFoundException};
+    }
+    if (defined $vals->{systemException}) {
+      $self->{systemException} = $vals->{systemException};
+    }
+  }
+  return bless ($self, $classname);
+}
+
+sub getName {
+  return 'NoteStore_setSharedNotebookRecipientSettings_result';
+}
+
+sub read {
+  my ($self, $input) = @_;
+  my $xfer  = 0;
+  my $fname;
+  my $ftype = 0;
+  my $fid   = 0;
+  $xfer += $input->readStructBegin(\$fname);
+  while (1) 
+  {
+    $xfer += $input->readFieldBegin(\$fname, \$ftype, \$fid);
+    if ($ftype == TType::STOP) {
+      last;
+    }
+    SWITCH: for($fid)
+    {
+      /^0$/ && do{      if ($ftype == TType::I32) {
+        $xfer += $input->readI32(\$self->{success});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^1$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{userException} = new EDAMErrors::EDAMUserException();
+        $xfer += $self->{userException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^2$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{notFoundException} = new EDAMErrors::EDAMNotFoundException();
+        $xfer += $self->{notFoundException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+      /^3$/ && do{      if ($ftype == TType::STRUCT) {
+        $self->{systemException} = new EDAMErrors::EDAMSystemException();
+        $xfer += $self->{systemException}->read($input);
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
+        $xfer += $input->skip($ftype);
+    }
+    $xfer += $input->readFieldEnd();
+  }
+  $xfer += $input->readStructEnd();
+  return $xfer;
+}
+
+sub write {
+  my ($self, $output) = @_;
+  my $xfer   = 0;
+  $xfer += $output->writeStructBegin('NoteStore_setSharedNotebookRecipientSettings_result');
+  if (defined $self->{success}) {
+    $xfer += $output->writeFieldBegin('success', TType::I32, 0);
+    $xfer += $output->writeI32($self->{success});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{userException}) {
+    $xfer += $output->writeFieldBegin('userException', TType::STRUCT, 1);
+    $xfer += $self->{userException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{notFoundException}) {
+    $xfer += $output->writeFieldBegin('notFoundException', TType::STRUCT, 2);
+    $xfer += $self->{notFoundException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{systemException}) {
+    $xfer += $output->writeFieldBegin('systemException', TType::STRUCT, 3);
+    $xfer += $self->{systemException}->write($output);
+    $xfer += $output->writeFieldEnd();
+  }
+  $xfer += $output->writeFieldStop();
+  $xfer += $output->writeStructEnd();
+  return $xfer;
+}
+
 package EDAMNoteStore::NoteStore_sendMessageToSharedNotebookMembers_args;
 use base qw(Class::Accessor);
 EDAMNoteStore::NoteStore_sendMessageToSharedNotebookMembers_args->mk_accessors( qw( authenticationToken notebookGuid messageText recipients ) );
@@ -14331,7 +14538,7 @@ sub write {
 
 package EDAMNoteStore::NoteStore_authenticateToSharedNote_args;
 use base qw(Class::Accessor);
-EDAMNoteStore::NoteStore_authenticateToSharedNote_args->mk_accessors( qw( guid noteKey ) );
+EDAMNoteStore::NoteStore_authenticateToSharedNote_args->mk_accessors( qw( guid noteKey authenticationToken ) );
 
 sub new {
   my $classname = shift;
@@ -14339,12 +14546,16 @@ sub new {
   my $vals      = shift || {};
   $self->{guid} = undef;
   $self->{noteKey} = undef;
+  $self->{authenticationToken} = undef;
   if (UNIVERSAL::isa($vals,'HASH')) {
     if (defined $vals->{guid}) {
       $self->{guid} = $vals->{guid};
     }
     if (defined $vals->{noteKey}) {
       $self->{noteKey} = $vals->{noteKey};
+    }
+    if (defined $vals->{authenticationToken}) {
+      $self->{authenticationToken} = $vals->{authenticationToken};
     }
   }
   return bless ($self, $classname);
@@ -14381,6 +14592,12 @@ sub read {
         $xfer += $input->skip($ftype);
       }
       last; };
+      /^3$/ && do{      if ($ftype == TType::STRING) {
+        $xfer += $input->readString(\$self->{authenticationToken});
+      } else {
+        $xfer += $input->skip($ftype);
+      }
+      last; };
         $xfer += $input->skip($ftype);
     }
     $xfer += $input->readFieldEnd();
@@ -14401,6 +14618,11 @@ sub write {
   if (defined $self->{noteKey}) {
     $xfer += $output->writeFieldBegin('noteKey', TType::STRING, 2);
     $xfer += $output->writeString($self->{noteKey});
+    $xfer += $output->writeFieldEnd();
+  }
+  if (defined $self->{authenticationToken}) {
+    $xfer += $output->writeFieldBegin('authenticationToken', TType::STRING, 3);
+    $xfer += $output->writeString($self->{authenticationToken});
     $xfer += $output->writeFieldEnd();
   }
   $xfer += $output->writeFieldStop();
@@ -15250,6 +15472,15 @@ sub updateSharedNotebook{
   die 'implement interface';
 }
 
+sub setSharedNotebookRecipientSettings{
+  my $self = shift;
+  my $authenticationToken = shift;
+  my $sharedNotebookId = shift;
+  my $recipientSettings = shift;
+
+  die 'implement interface';
+}
+
 sub sendMessageToSharedNotebookMembers{
   my $self = shift;
   my $authenticationToken = shift;
@@ -15349,6 +15580,7 @@ sub authenticateToSharedNote{
   my $self = shift;
   my $guid = shift;
   my $noteKey = shift;
+  my $authenticationToken = shift;
 
   die 'implement interface';
 }
@@ -15889,6 +16121,15 @@ sub updateSharedNotebook{
   return $self->{impl}->updateSharedNotebook($authenticationToken, $sharedNotebook);
 }
 
+sub setSharedNotebookRecipientSettings{
+  my ($self, $request) = @_;
+
+  my $authenticationToken = ($request->{'authenticationToken'}) ? $request->{'authenticationToken'} : undef;
+  my $sharedNotebookId = ($request->{'sharedNotebookId'}) ? $request->{'sharedNotebookId'} : undef;
+  my $recipientSettings = ($request->{'recipientSettings'}) ? $request->{'recipientSettings'} : undef;
+  return $self->{impl}->setSharedNotebookRecipientSettings($authenticationToken, $sharedNotebookId, $recipientSettings);
+}
+
 sub sendMessageToSharedNotebookMembers{
   my ($self, $request) = @_;
 
@@ -15989,7 +16230,8 @@ sub authenticateToSharedNote{
 
   my $guid = ($request->{'guid'}) ? $request->{'guid'} : undef;
   my $noteKey = ($request->{'noteKey'}) ? $request->{'noteKey'} : undef;
-  return $self->{impl}->authenticateToSharedNote($guid, $noteKey);
+  my $authenticationToken = ($request->{'authenticationToken'}) ? $request->{'authenticationToken'} : undef;
+  return $self->{impl}->authenticateToSharedNote($guid, $noteKey, $authenticationToken);
 }
 
 sub findRelated{
@@ -19380,6 +19622,64 @@ sub recv_updateSharedNotebook{
   }
   die "updateSharedNotebook failed: unknown result";
 }
+sub setSharedNotebookRecipientSettings{
+  my $self = shift;
+  my $authenticationToken = shift;
+  my $sharedNotebookId = shift;
+  my $recipientSettings = shift;
+
+    $self->send_setSharedNotebookRecipientSettings($authenticationToken, $sharedNotebookId, $recipientSettings);
+  return $self->recv_setSharedNotebookRecipientSettings();
+}
+
+sub send_setSharedNotebookRecipientSettings{
+  my $self = shift;
+  my $authenticationToken = shift;
+  my $sharedNotebookId = shift;
+  my $recipientSettings = shift;
+
+  $self->{output}->writeMessageBegin('setSharedNotebookRecipientSettings', TMessageType::CALL, $self->{seqid});
+  my $args = new EDAMNoteStore::NoteStore_setSharedNotebookRecipientSettings_args();
+  $args->{authenticationToken} = $authenticationToken;
+  $args->{sharedNotebookId} = $sharedNotebookId;
+  $args->{recipientSettings} = $recipientSettings;
+  $args->write($self->{output});
+  $self->{output}->writeMessageEnd();
+  $self->{output}->getTransport()->flush();
+}
+
+sub recv_setSharedNotebookRecipientSettings{
+  my $self = shift;
+
+  my $rseqid = 0;
+  my $fname;
+  my $mtype = 0;
+
+  $self->{input}->readMessageBegin(\$fname, \$mtype, \$rseqid);
+  if ($mtype == TMessageType::EXCEPTION) {
+    my $x = new TApplicationException();
+    $x->read($self->{input});
+    $self->{input}->readMessageEnd();
+    die $x;
+  }
+  my $result = new EDAMNoteStore::NoteStore_setSharedNotebookRecipientSettings_result();
+  $result->read($self->{input});
+  $self->{input}->readMessageEnd();
+
+  if (defined $result->{success} ) {
+    return $result->{success};
+  }
+  if (defined $result->{userException}) {
+    die $result->{userException};
+  }
+  if (defined $result->{notFoundException}) {
+    die $result->{notFoundException};
+  }
+  if (defined $result->{systemException}) {
+    die $result->{systemException};
+  }
+  die "setSharedNotebookRecipientSettings failed: unknown result";
+}
 sub sendMessageToSharedNotebookMembers{
   my $self = shift;
   my $authenticationToken = shift;
@@ -20035,8 +20335,9 @@ sub authenticateToSharedNote{
   my $self = shift;
   my $guid = shift;
   my $noteKey = shift;
+  my $authenticationToken = shift;
 
-    $self->send_authenticateToSharedNote($guid, $noteKey);
+    $self->send_authenticateToSharedNote($guid, $noteKey, $authenticationToken);
   return $self->recv_authenticateToSharedNote();
 }
 
@@ -20044,11 +20345,13 @@ sub send_authenticateToSharedNote{
   my $self = shift;
   my $guid = shift;
   my $noteKey = shift;
+  my $authenticationToken = shift;
 
   $self->{output}->writeMessageBegin('authenticateToSharedNote', TMessageType::CALL, $self->{seqid});
   my $args = new EDAMNoteStore::NoteStore_authenticateToSharedNote_args();
   $args->{guid} = $guid;
   $args->{noteKey} = $noteKey;
+  $args->{authenticationToken} = $authenticationToken;
   $args->write($self->{output});
   $self->{output}->writeMessageEnd();
   $self->{output}->getTransport()->flush();
@@ -21414,6 +21717,27 @@ sub process_updateSharedNotebook {
     $output->getTransport()->flush();
 }
 
+sub process_setSharedNotebookRecipientSettings {
+    my ($self, $seqid, $input, $output) = @_;
+    my $args = new EDAMNoteStore::NoteStore_setSharedNotebookRecipientSettings_args();
+    $args->read($input);
+    $input->readMessageEnd();
+    my $result = new EDAMNoteStore::NoteStore_setSharedNotebookRecipientSettings_result();
+    eval {
+      $result->{success} = $self->{handler}->setSharedNotebookRecipientSettings($args->authenticationToken, $args->sharedNotebookId, $args->recipientSettings);
+    }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
+      $result->{userException} = $@;
+        }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMNotFoundException') ){ 
+      $result->{notFoundException} = $@;
+        }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMSystemException') ){ 
+      $result->{systemException} = $@;
+    }
+    $output->writeMessageBegin('setSharedNotebookRecipientSettings', TMessageType::REPLY, $seqid);
+    $result->write($output);
+    $output->writeMessageEnd();
+    $output->getTransport()->flush();
+}
+
 sub process_sendMessageToSharedNotebookMembers {
     my ($self, $seqid, $input, $output) = @_;
     my $args = new EDAMNoteStore::NoteStore_sendMessageToSharedNotebookMembers_args();
@@ -21673,7 +21997,7 @@ sub process_authenticateToSharedNote {
     $input->readMessageEnd();
     my $result = new EDAMNoteStore::NoteStore_authenticateToSharedNote_result();
     eval {
-      $result->{success} = $self->{handler}->authenticateToSharedNote($args->guid, $args->noteKey);
+      $result->{success} = $self->{handler}->authenticateToSharedNote($args->guid, $args->noteKey, $args->authenticationToken);
     }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMUserException') ){ 
       $result->{userException} = $@;
         }; if( UNIVERSAL::isa($@,'EDAMErrors::EDAMNotFoundException') ){ 
