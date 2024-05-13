@@ -1,3 +1,7 @@
+# Deprecated
+This SDK is no longer supported and will not receive any further updates or maintenance.
+
+---
 Evernote SDK for Perl
 ==========================================
 
